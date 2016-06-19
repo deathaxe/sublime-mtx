@@ -1,0 +1,759 @@
+%YAML 1.2
+# The MIT License (MIT)
+#
+# Copyright (c) 2016 DeathAxe <deathaxe82@googlemail.com>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+###############################################################################
+---
+name: MTX NC Program
+file_extensions:
+  - cpl
+  - npg
+  - prg
+first_line_match: '\((?:CPL|DIN|NPG)\)|\bGOTO\s*.\w+\b'
+scope: source.mtx_npg
+
+variables:
+  sign: '\s*[-+]?'
+  float: '(?:\d+\.?\d*|\.\d+)'
+  # DIN label (see R911342633_02 P.62)
+  label: '[A-z_][A-z_]\w+\b'
+
+###############################################################################
+# MAIN CONTEXT
+###############################################################################
+
+contexts:
+
+  main:
+    - match: '/(?!/).*$'
+      scope: comment.disabled.mtx_npg
+
+    - match: '^\s*\d+'
+      scope: comment.blockno.cpl.mtx_npg
+      push: cpl-statements
+
+    - match: '^\s*(?:N\d+)?'
+      scope: comment.blockno.din.mtx_npg
+      push: din-statements
+
+###############################################################################
+# COMMON PROTOTYPES
+#   used in DIN and CPL statements
+###############################################################################
+
+  line-end:
+    - match: $
+      pop: true
+
+  scope-end:
+    - match: '(?=\S)|$'
+      pop: true
+
+  illegal-end:
+    # mark rest of the line as illegal beginning with the first
+    # none whitespace letter
+    - match: (?:\S.*)?$
+      scope: invalid.illegal.mtx_npg
+      pop: true
+
+  illegal:
+    - match: \S
+      scope: invalid.illegal.mtx_npg
+
+  strings:
+    - match: '"'
+      scope: punctuation.definition.string.begin.mtx_npg
+      push:
+        # double quoted strings with embedded highlighting
+        - meta_scope: string.quoted.double.mtx_npg
+        # embedded double quotes
+        - match: \'"\'
+          scope: constant.character.escape.double-quoted.mtx_npg
+        # valid end of double quoted string
+        - match: '"'
+          scope: punctuation.definition.string.end.mtx_npg
+          pop: true
+        # invalid end of double quoted string
+        - match: '[^"]$'
+          scope: invalid.illegal.mtx_npg
+          pop: true
+
+  operators:
+    - match: '[-+*/]'
+      scope: keyword.operator.arithmetic.mtx_npg
+      push: after-operators
+    - match: '<>|>=|<=|[=<>]'
+      scope: keyword.operator.relational.mtx_npg
+      push: after-operators
+    - match: \b(?:AND|X?OR|NOT)\b
+      scope: keyword.operator.logical.mtx_npg
+      push: after-operators
+
+  operators-seperator:
+    - match: ','
+      scope: punctuation.arguments.seperator.mtx_npg
+      push: after-operators
+
+  after-operators:
+    - match: '{{sign}}'
+      scope: constant.numeric.mtx_npg
+      pop: true
+
+###############################################################################
+# +-------------------------------------------------------------------------+ #
+# | DIN STATEMENTS                                                          | #
+# +-------------------------------------------------------------------------+ #
+###############################################################################
+
+  din-statements:
+    - meta_scope: meta.din.line.mtx_npg
+    - include: line-end
+    - include: din-positions
+    - include: din-parameter
+    - include: din-ncfunction
+    - include: din-comment-line
+    - include: din-comment-doc
+    - include: din-constants
+    - include: operators
+    - include: din-stmt-goto
+    - include: din-stmt-msg
+    - include: din-functions
+    - include: din-stmt-procedures
+    - include: din-stmt-definition-sub
+    - include: din-stmt-repeat
+    - include: din-stmt-pragma
+    - include: din-comment-block
+    - include: illegal
+
+  din-stmt-end:
+    - include: din-comment
+    - include: illegal-end
+
+  din-stmt-pragma:
+    - match: \$\d+\b
+      scope: string.pragma.assert-chan.mtx_npg
+      set: din-stmt-end
+    - match: \((?:DIN|CPL)\)
+      scope: string.pragma.source-type.mtx_npg
+      set: din-stmt-end
+    - match: \(ADR_PARA\)
+      scope: string.pragma.din-arguments.mtx_npg
+      set: din-stmt-end
+
+  din-stmt-goto:
+    - match: 'Go(?:Ahead|Back|Cond|To)|GO[ABC]\b'
+      scope: keyword.control.flow.din.mtx_npg
+      set:
+        - meta_content_scope: meta.din.line.mtx_npg
+        - match: '{{label}}|N\d+\b'
+          scope: string.unquoted.mtx_npg
+          set: din-stmt-end
+        - include: din-embedded-cpl
+        - include: din-stmt-end
+    - match: '({{label}})(:)'
+      captures:
+        1: entity.name.tag.din.mtx_npg
+        2: punctuation.definition.tag.din.mtx_npg
+      set: din-stmt-end
+
+  din-stmt-msg:
+    # a message formed as kind of comment (deprecated)
+    - match: \(MSG\s*,
+      scope: comment.msg.mtx_npg
+      set:
+        - meta_content_scope: meta.din.line.mtx_npg string.unquoted.msg.mtx_npg
+        - match: \)
+          scope: comment.msg.mtx_npg
+          set: din-stmt-end
+    # a message with unquoted string inside
+    - match: (MSG)\s*(\()\s*(?!\")
+      scope: meta.function-call.mtx_npg
+      captures:
+        1: support.function.mtx_npg
+        2: punctuation.arguments.begin.mtx_npg
+      set:
+        - meta_content_scope: meta.din.line.mtx_npg meta.function-call.mtx_npg
+        - match: \)
+          scope: punctuation.arguments.end.mtx_npg
+          set: din-stmt-end
+        - match: \S
+          scope: string.unquoted.msg.mtx_npg
+
+  din-stmt-procedures:
+    # NO PARAMETERS ALLOWED!
+    - match: WAIT\b
+      scope: meta.function-call.mtx_npg support.function.mtx_npg
+      set: din-stmt-end
+    # DIN PARAMETERS ALLOWED!
+    - match: '(?:S?|WR?)EV\b'
+      scope: meta.function-call.mtx_npg support.function.mtx_npg
+      set:
+        - meta_content_scope: meta.din.line.mtx_npg meta.function-call.mtx_npg
+        - include: din-arguments-in-parens
+        - include: din-stmt-end
+    # CPL PARAMETERS ALLOWED!
+    - match: '(?:SSD[EQ]?|WAIT[AO]|[SW]PVE?|(?:[ABW]STOP|OFFSTOP)[AO])\b'
+      scope: meta.function-call.mtx_npg support.function.mtx_npg
+      set:
+        - meta_content_scope: meta.din.line.mtx_npg meta.function-call.mtx_npg
+        - include: cpl-arguments-in-brackets
+        - include: din-stmt-end
+
+  din-stmt-definition-sub:
+    - match: LPS\b
+      scope: keyword.definition.function.begin.mtx_npg
+      set:
+        - meta_content_scope: meta.din.line.mtx_npg
+        - match: \b\w+\b
+          scope: entity.name.function.mtx_npg
+          set: din-stmt-end
+        - include: din-stmt-end
+    - match: PEND\b
+      scope: keyword.definition.function.end.mtx_npg
+      set: din-stmt-end
+
+  din-stmt-repeat:
+    - match: R(?:PT|EPEA?T)\b
+      scope: meta.control.mtx_npg keyword.control.flow.mtx_npg
+      set:
+        - meta_content_scope: meta.din.line.mtx_npg meta.control.mtx_npg
+        - include: line-end
+        - include: din-arguments-in-parens
+        - include: cpl-arguments-in-brackets
+        - match: (?=\S)
+          set: din-stmt-call
+    - include: din-stmt-call      # must follow din-stmt-definition-sub
+
+  din-stmt-call:
+    - match: 'L?P\b'
+      scope: meta.function-call.mtx_npg keyword.control.flow.mtx_npg
+      set:
+        - meta_content_scope: meta.din.line.mtx_npg meta.function-call.mtx_npg
+        - match: '\b[\w\.]+\b'
+          scope: entity.name.program.mtx_npg
+          set: din-subprogram-args
+        - include: din-stmt-cplprog
+        - include: din-stmt-end
+    - match: '[\w\.]+\b'
+      scope: meta.function-call.mtx_npg entity.name.program.mtx_npg
+      set: din-subprogram-args
+    - include: din-stmt-cplprog
+
+  din-stmt-cplprog:
+    # sub program call as embedded CPL statement in a DIN block
+    # e.g.: N10 [ProgName$](VarName[CplVal%]) CPL ; comment
+    # Can't use din-embedded-cpl, because the next ( after ]
+    # must be interpreted as start of a din-arguments-in-parens
+    # but not a comment-block. This is CPL hell!!!
+    - match: \[
+      scope: punctuation.cpl.begin.mtx_npg
+      push:
+        - meta_content_scope: meta.cpl.mtx_npg
+        - match: \]
+          scope: punctuation.cpl.end.mtx_npg
+          set:
+            - include: din-subprogram-attribute
+            - include: din-arguments-in-parens
+            - include: cpl-arguments-in-brackets
+            - include: scope-end
+        - include: cpl-expressions
+
+  din-subprogram-args:
+    - meta_content_scope: meta.din.line.mtx_npg meta.function-call.mtx_npg
+    - include: din-subprogram-attribute
+    - include: din-arguments-in-parens
+    - include: cpl-arguments-in-brackets
+    - include: din-stmt-end
+
+  din-subprogram-attribute:
+    - match: '\b(?:DIN|CPL)\b'
+      scope: storage.type.modifier
+      set: din-stmt-end  # only used for sub programs, which must finish a row
+
+###############################################################################
+# DIN EXPRESSIONS
+###############################################################################
+
+  din-comment:
+    - include: din-comment-line
+    - include: din-comment-doc
+    - include: din-comment-block
+
+  din-comment-block:
+    - match: \(
+      push:
+        - meta_scope: comment.block.mtx_npg
+        - match: \)
+          pop: true
+        - include: din-comment-ignored
+
+  din-comment-ignored:
+    - match: \(
+      push:
+        - match: \)
+          pop: true
+        - include: din-comment-ignored
+
+  din-comment-doc:
+    - match: //
+      push:
+        - meta_scope: comment.doc.mtx_npg
+        - match: \\\\|$
+          pop: true
+
+  din-comment-line:
+    - match: ;.*$
+      scope: comment.line.mtx_npg
+      pop: true
+
+  din-constants:
+    - include: strings
+    - match: '{{float}}'
+      scope: constant.numeric.mtx_npg
+    # position accuracy for G0(...), G1(...), ...
+    - match: \b(?:NIPS|IPS[1-3]|POL|POLAR)\b
+      scope: constant.language.positioning.mtx_npg
+
+  din-functions:
+    - match: (?:A(?:A[CS]|ctRadFact|DJ|djust|IT|JK|LN|R[AF]|rea|ssLogName|T(?:[RS]?|rans|SW)|V[ES]|x(?:Ac(?:c|cSave)|Couple|is(?:Replace|ToSpindle)|Jerk|Ve(?:l|lSave))|X[CR])|B(?:CR|csCorr|lkNmb|NB)|C(?:FD|G0|h(?:kNxtBlk|Length|Section)|H[LS]|L[DN]|NB|o(?:llision|n(?:fG0|stFeed)|ord|rnerLineDetection|upleSplineTab)|PI|RD|ST|urveParamInterpolation)|D(?:AX|C[RS]|cTSel|ef(?:Axis|Spindle|TangTrans)|IA|i(?:aProg|stCtrl)|SP|TT)|E(?:ndPosCouple|PC)|F(?:AD|D(?:G|GT)|eed(?:Ad|Forward|Gr(?:p|pType))|FW|lyMeas|ME|S[MPRT]|s(?:Move|Probe|Reset|Torque))|G(?:AX|et(?:Axis|Spindle)|O[ABC]|o(?:Ahead|Back|Cond)|SP)|H(?:SB|sBlkSwitch)|I(?:ME|n(?:itMeas|vTime)|TIM)|J(?:AL|erk(?:AxList|Control)|KC)|K(?:inSplitDisable|SD|VP|vProg)|L(?:F(?:[CP]?|Conf)|in(?:DownFeed|earToSpline|ModZp|UpFeed)|MZ|N[DU]|TS)|M(?:ainSp|IR|irror|OD|odulo|S[GP])|N(?:IB|ibble)|O|O(?:V[DE]|vr(?:Dis|Ena))|P(?:AC|athAcc|HS|LS|M[DS]|mTSel|o(?:l(?:arPol|eSet)|s(?:DepHSOut|Mode))|OP|recProg|RP|t(?:BlkEnd|Default|Inpos|pMove)|T[DEIP]|UN|unch)|R(?:A[CDX]|ad(?:ialAcc|Prog)|CB|DT|e(?:cordRevVec|dTorque|entContBlk|m(?:Axis|LogName|Spindle))|LN|N[DE]|OT|o(?:tate|und(?:Eps|ing))|RV|SP)|S(?:2[DU]|cale|C(?:[CLO]?|CT|LN|OL)|e(?:lCrdCoupl(?:e|eTab)|tPos)|hift|HT|in(?:2(?:DownFeed|UpFeed)|DownFeed|UpFeed)|m(?:ax|in)|M[DENX]|N[DU]|P(?:[ADMST]?|C(?:_WA|[CDEPS]?|P_W)|WAIT)|p(?:Admin|Couple(?:_Wait|Config|Dist|ErrWin|P(?:o|osOffs)|Sync)|indle(?:ToAxis|Wai(?:t|tMode))|li(?:ne(?:Cornerin(?:g|gLocal)|Def)|t)|Mode)|S(?:P[MOS]|p(?:Move|Ori|Speed))|T(?:[AO]?|AW)|t(?:atToolOri|epMode(?:Disable|Enable))|WM)|sOffs_Wait|T(?:a(?:ngToo(?:l|lOri)|ppSp|rgetAxisConf)|AX|CS|csDef|hreadSet|rans|RS|S[PT]|T[LO])|V(?:AP|irtAxisPos)|W(?:aitAxis|AX|ID3|in|riteId3)|Z(?:OS|oTSel))\b
+      scope: support.function.din.mtx_npg
+      push:
+        - meta_scope: meta.function-call.mtx_npg
+        - include: din-arguments-in-parens
+        - include: scope-end
+
+  din-ncfunction:
+    # G-function:   G0, G52.1
+    # G-function:   G0(NIPS)
+    - match: G\d+
+      scope: support.function.mtx_npg
+      push:
+        - meta_scope: meta.function-call.mtx_npg
+        - match: (\.)(\d+)\b
+          captures:
+            1: punctuation.seperator.bank.din.mtx_npg
+            2: entity.other.attribute-name.mtx_npg
+        - include: din-arguments-in-parens
+        - include: scope-end
+
+    # M-function:   M100
+    # M-function:   M[fun%]
+    - match: '[MHT](?:\d+|(?=\s*[=\[]))'
+      scope: support.function.mtx_npg
+      push:
+        - meta_scope: meta.din-auxfun.mtx_npg
+        - match: \d+
+          scope: constant.numeric.mtx_npg
+        - include: din-embedded-cpl
+        - include: scope-end
+
+  din-parameter:
+    # parameter adresses ending with letters: F FA DF DFA S DS ...
+    # F2200.5 | F 2200.5 | F=2200.5 | F.2205 | F .2205 | F[SPEED!]
+    # parameter adresses ending with digit: F2 S2 DF2 DS2 ...
+    # F2=2200.5 | F2 = 2200.5 | F2[SPEED!]
+    - match: '(?x)
+              (?:D?(?:F[A]?|S)|[IJKOR])(?:
+                \d+\s*(?=[=\[]) |
+                \s*(?=[=\[\.\d])
+              )'
+      scope: support.variable.param.mtx_npg
+      push:
+        - meta_scope: meta.din-param.mtx_npg
+        - include: din-parameter-value-float
+
+    # D<edge> ED<edge>
+    - match: 'E?D(?=\s*[=\d\[])'
+      scope: support.variable.edge.mtx_npg
+      push:
+        - meta_scope: meta.din-edge.mtx_npg
+        - match: \d+
+          scope: constant.numeric.mtx_npg
+        - include: din-embedded-cpl
+        - include: scope-end
+
+    # IC(...), DC(...), AC(...), ACP(...), ACN(...)
+    # INCH(...), MM(...), S(...)
+    - match: '(?:[ID]C|AC[PN]?|INCH|MM|S)\b'
+      scope: support.variable.property.mtx_npg
+      push:
+        - include: din-arguments-in-parens
+        - include: scope-end
+
+  din-positions:
+    # Achse X
+    # X2.8 | X 2.8 | X+2.8 | X-2.8 | X=2.8 | X.8 | X .8 | X[POS!]
+    # Achse X2
+    # X2 2.8 | X2+2.8 | X2-2.8 | X2=2.8 | X2 .8 | X2[POS!]
+    - match: '(?x)
+              [ABCEQUVWXYZ][A-Z]{,2}
+              (?:
+                \d+\b
+                  (?:
+                    \s+(?=[\.\d]) |
+                    \s*(?=[-+=,\[\(\)])
+                  ) |
+                \s*(?=[-+=\[\.\d])
+              )'
+      scope: support.variable.axis.mtx_npg
+      push:
+        - meta_scope: meta.position.mtx_npg
+        - include: din-parameter-value-float
+
+  din-parameter-value-float:
+    - match: '[-+]?{{float}}'
+      scope: constant.numeric.mtx_npg
+      pop: true
+    - include: din-embedded-cpl
+    - include: scope-end
+
+  din-arguments-in-parens:
+    # see R911342633_02 P.53
+    # examples:
+    # N10 P program(3.4)
+    # N15 P program(-3.4)
+    # N20 P program(A3.4)
+    # N25 P program(A 3.4)
+    # N30 P program(A-3.4)
+    # N35 P program(A=3.4)
+    # N40 P program(A=-3.4)
+    # N45 P program(SD.value)
+    # N50 P program(A SD.value)
+    # N55 P program(A cplvar%)
+    # N60 P program(A [<cpl>])
+    - match: \(
+      scope: punctuation.arguments.begin.mtx_npg
+      push: din-arguments-body
+
+  din-arguments-body:
+    - meta_content_scope: meta.arguments.mtx_npg
+    - include: din-arguments-end
+    - match: '[-+]'
+      scope: constant.numeric.mtx_npg
+      set: din-arguments-body-value
+    # parameter address ending with letter
+    # X2.8 | X 2.8 | X-2.8 | X=2.8 | X.8 | X .8 | X[POS!]
+    # parameter address ending with digit
+    # X2 2.8 | X2 -2.8 | X2=2.8 | X2 .8 | X2[POS!]
+    # also allows SEC%[POS!] as CPL-vars can be keys here
+    - match: '(?x)
+              [A-z_][\w?%!$]*?
+              (?:
+                \d+
+                  (?:
+                    \s+(?=[-\.\d\"]) |
+                    \s*(?=[=\[])
+                  ) |
+                \s*(?=[-=\[\d])
+              )'
+      scope: variable.parameter.mtx_npg
+      set: din-arguments-body-value
+
+    - match: '(?=\S)'
+      set: din-arguments-body-value
+
+  din-arguments-body-value:
+    - meta_content_scope: meta.arguments.mtx_npg
+    - include: din-arguments-end
+    - include: din-comment
+    - include: din-embedded-cpl
+    - include: cpl-expressions
+
+  din-arguments-end:
+    - match: \)
+      scope: punctuation.arguments.end.mtx_npg
+      set:
+        - include: din-comment
+        - include: scope-end
+    - match: ','
+      scope: punctuation.arguments.seperator.mtx_npg
+      set: din-arguments-body
+
+  din-embedded-cpl:
+    - match: \[
+      scope: punctuation.cpl.begin.mtx_npg
+      push:
+        - match: '{{sign}}'
+          scope: meta.cpl.mtx_npg constant.numeric.mtx_npg
+          set:
+            - meta_content_scope: meta.cpl.mtx_npg
+            - match: \]
+              scope: punctuation.cpl.end.mtx_npg
+              pop: true
+            - include: cpl-expressions
+
+###############################################################################
+# +-------------------------------------------------------------------------+ #
+# | CPL STATEMENTS                                                          | #
+# +-------------------------------------------------------------------------+ #
+###############################################################################
+
+  cpl-statements:
+    - meta_scope: meta.cpl.line.mtx_npg
+    - include: line-end
+    - match: ':'
+      scope: punctuation.statements.seperator.mtx_npg
+    - include: cpl-stmt-declaration
+    - include: cpl-stmt-control
+    - include: cpl-stmt-goto
+    - include: cpl-stmt-call
+    - include: cpl-expressions
+    - include: illegal
+
+  cpl-block-end:
+    - include: cpl-comment-line
+    - include: illegal-end
+
+  cpl-stmt-end:
+    # start clean CPL statement block
+    - match: ':'
+      scope: punctuation.statements.seperator.mtx_npg
+      set: cpl-statements
+    # IF <expr> THEN <stmt> ELSE <stmt> ENDIF my occure in one line
+    # so ELSE must start a new clean CPL statement
+    - match: '\bELSE\b'
+      scope: meta.control.mtx_npg keyword.control.flow.mtx_npg
+      set: cpl-statements
+    - match: '\bENDIF\b'
+      scope: meta.control.mtx_npg keyword.control.flow.mtx_npg
+      set: cpl-block-end
+    - include: cpl-block-end
+
+  cpl-stmt-declaration:
+    - match: P?DIM\b
+      scope: meta.declaration.mtx_npg storage.type.name.mtx_npg
+      set:
+        - meta_content_scope: meta.cpl.line.mtx_npg meta.declaration.mtx_npg
+        - include: cpl-expressions
+        - include: cpl-stmt-end
+
+  cpl-stmt-control:
+    - match: CASE\b
+      scope: meta.control.mtx_npg keyword.control.flow.mtx_npg
+      set:
+        - meta_content_scope: meta.cpl.line.mtx_npg meta.control.mtx_npg
+        - match: \bOF\b
+          scope: keyword.control.flow.mtx_npg
+        - include: cpl-expressions
+        - include: cpl-stmt-end
+
+    - match: IF\b
+      scope: meta.control.mtx_npg keyword.control.flow.mtx_npg
+      set:
+        - meta_content_scope: meta.cpl.line.mtx_npg meta.control.mtx_npg
+        - match: \bTHEN\b
+          scope: keyword.control.flow.mtx_npg
+          set: cpl-statements
+        - include: cpl-expressions
+        - include: cpl-block-end
+
+    - match: FOR\b
+      scope: meta.control.mtx_npg keyword.control.flow.mtx_npg
+      set:
+        - meta_content_scope: meta.cpl.line.mtx_npg meta.control.mtx_npg
+        - match: \b(?:STEP|TO)\b
+          scope: keyword.control.flow.mtx_npg
+        - include: cpl-expressions
+        - include: cpl-stmt-end
+
+    - match: WHILE\b
+      scope: meta.control.mtx_npg keyword.control.flow.mtx_npg
+      set:
+        - meta_content_scope: meta.cpl.line.mtx_npg meta.control.mtx_npg
+        - match: \bDO\b
+          scope: keyword.control.flow.mtx_npg
+        - include: cpl-expressions
+        - include: cpl-stmt-end
+
+    - match: (?:NEXT|UNTIL)\b
+      scope: meta.control.mtx_npg keyword.control.flow.mtx_npg
+      set:
+        - meta_content_scope: meta.cpl.line.mtx_npg meta.control.mtx_npg
+        - include: cpl-expressions
+        - include: cpl-stmt-end
+
+    - match: (?:E(?:LSE|ND(?:CASE|IF|WHILE))|LABEL|OTHERWISE|REPEAT|RPT)\b
+      scope: keyword.control.flow.mtx_npg
+
+  cpl-stmt-call:
+    # known CPL procedures (see R911342633_02 P.605ff.)
+    - match: (?:CL(?:OSE|RWARN)|DB(?:LOAD|MOVE|SAVE)|LJUST|MMC|NJUST|OPEN[RW]|REWRITE|S(?:CS(?:3|3L)|D(?:LOAD|SAVE)|E(?:EK|T(?:ERR|MSG|WARN)))|W(?:AIT|CS|SCS)|XTABCR|ZO(?:C(?:DEL|INS)|TCR))\b
+      scope: meta.function-call.mtx_npg support.function.cpl.mtx_npg
+      set:
+        - meta_content_scope: meta.cpl.line.mtx_npg meta.function-call.mtx_npg
+        - include: cpl-arguments-in-parens
+        - include: cpl-stmt-end
+    # sub program call (see R911342633_02 P.51f.)
+    - match: CALL\b
+      scope: meta.function-call.mtx_npg keyword.control.flow.mtx_npg
+      set:
+        - meta_content_scope: meta.cpl.line.mtx_npg meta.function-call.mtx_npg
+        - match: '[\w\.]+\b'
+          scope: entity.name.program.mtx_npg
+          set:
+            - meta_content_scope: meta.cpl.line.mtx_npg meta.function-call.mtx_npg
+            - match: '\b(?:DIN|CPL)\b'
+              scope: storage.type.modifier
+              set: cpl-block-end
+            - include: din-arguments-in-parens # cpl-arguments-in-parens
+            - include: cpl-arguments-in-brackets
+            - include: cpl-block-end
+        - include: cpl-block-end
+
+  cpl-stmt-goto:
+    - match: GOTO\b
+      scope: meta.goto.mtx_npg keyword.control.flow.mtx_npg
+      set:
+        - meta_content_scope: meta.cpl.line.mtx_npg meta.goto.mtx_npg
+        - match: '(?:\.\w+|\bN\d+)\b'
+          scope: string.unquoted.mtx_npg
+          set: cpl-stmt-end
+        - include: cpl-stmt-end
+    - match: '(\.)({{label}})\b'
+      captures:
+        1: punctuation.definition.tag.cpl.mtx_npg
+        2: entity.name.tag.cpl.mtx_npg
+      set: cpl-stmt-end
+
+###############################################################################
+# CPL EXPRESSIONS
+###############################################################################
+
+  cpl-expressions:
+    - include: cpl-constants
+    - include: cpl-comment-line
+    - include: operators
+    - include: cpl-functions
+    - include: cpl-systemdata
+    - include: cpl-variables
+    - include: cpl-group
+
+  cpl-group:
+    - match: \(
+      scope: punctuation.group.begin.mtx_npg
+      push:
+        - match: '{{sign}}'
+          scope: constant.numeric.mtx_npg
+          set:
+            - match: \)
+              scope: punctuation.group.end.mtx_npg
+              pop: true
+            - include: cpl-expressions
+
+  cpl-arguments-in-parens:
+    # see R911342633_02 P.53f.
+    - match: \(
+      scope: punctuation.arguments.begin.mtx_npg
+      push:
+        - match: '{{sign}}'
+          scope: constant.numeric.mtx_npg
+          set:
+            - meta_scope: meta.arguments.mtx_npg
+            - match: \)
+              scope: punctuation.arguments.end.mtx_npg
+              set:
+                - include: din-comment
+                - include: scope-end
+            - include: operators-seperator
+            - include: cpl-expressions
+
+  cpl-arguments-in-brackets:
+    # see R911342633_02 P.55f.
+    - match: \[
+      scope: punctuation.arguments.begin.mtx_npg
+      push:
+        - match: '{{sign}}'
+          scope: constant.numeric.mtx_npg
+          set:
+            - meta_scope: meta.arguments.mtx_npg
+            - match: \]
+              scope: punctuation.arguments.end.mtx_npg
+              set:
+                - include: din-comment
+                - include: scope-end
+            - include: operators-seperator
+            - include: cpl-expressions
+
+  cpl-comment-line:
+    - match: \bREM\b.*$
+      scope: comment.line.mtx_npg
+      pop: true
+    - include: din-comment-line
+
+  cpl-constants:
+    - include: strings
+    - match: '0b[01]+'
+      scope: constant.numeric.binary.mtx_npg
+    - match: '0h\h+'
+      scope: constant.numeric.hex.mtx_npg
+    # CPL real requires 0.1234 (.1234 not allowed)
+    - match: '\d+\.\d+'
+      scope: constant.numeric.float.mtx_npg
+    - match: '\d+'
+      scope: constant.numeric.int.mtx_npg
+    - match:  \b(?:TRUE|FALSE)\b
+      scope: constant.numeric.bool.mtx_npg
+    - match:  \b(?:ERRNO[%\b]|NUL)\b
+      scope: constant.language.mtx_npg
+
+  cpl-variables:
+    - match: '[@#]?\w+[%$?!]?'
+      scope: variable.other.mtx_npg
+      push:
+        - meta_scope: meta.variable.mtx_npg
+        - include: cpl-arguments-in-parens
+        - include: scope-end
+
+  cpl-systemdata:
+    - match: '\bSD(?=\.)'
+      scope: support.variable.class.mtx_npg
+      push:
+        - meta_scope: meta.sysdata.mtx_npg
+        - include: cpl-systemdata-member
+        - include: scope-end
+
+  cpl-systemdata-member:
+    - match: (\.)(\w+)\b
+      captures:
+        1: punctuation.member.seperator.mtx_npg
+        2: entity.other.attribute-name.mtx_npg
+      push:
+        - include: cpl-arguments-in-brackets
+        - include: scope-end
+
+  cpl-functions:
+    # functions with stupid endings see R911342633_02 P.605ff.
+    - match: (?:AXADR|CHR|MID|STR|TRIM|VERSINF)\$|(?:INP|PRN)#
+      scope: support.function.cpl.mtx_npg
+      push:
+        - meta_scope: meta.function-call.mtx_npg
+        - include: cpl-arguments-in-parens
+        - include: scope-end
+
+    # known CPL functions see R911342633_02 P.605ff.
+    # must not be followed by '.' because of 'SD' being used as function and variable
+    - match: (?:A(?:BS|C(?:OS|S)|POS|S(?:C|IN)|TA(?:N|N2)|X(?:INF|[OP]?))|B(?:CD|I(?:N|TIF))|C(?:LOCK|O[FS])|D(?:ATE|B(?:SE(?:A|AX)|TA(?:B|B(?:X|XL)))|CT|IR(?:CR|DEL|INF)|PC)|E(?:OF|RASE)|FILE(?:ACCESS|COPY|DATE|NO|POS|SIZE)|GETERR|IN(?:STR|T)|LEN|MC(?:[AS]?|O(?:DS|PS))|NCF|P(?:C(?:S|SPROBE)|LC|M[TV]|POS|ROBE)|ROUND|S(?:D|DR|IN|POS|QRT)|T(?:AN|CV|IME)|VA(?:L|RINF)|WCS|XTAB|ZO[TV])\b(?!\.)
+      scope: support.function.cpl.mtx_npg
+      push:
+        - meta_scope: meta.function-call.mtx_npg
+        - include: cpl-arguments-in-parens
+        - include: scope-end
+

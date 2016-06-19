@@ -1,0 +1,24 @@
+<snippet>
+<description>subprogram</description>
+<content>
+<![CDATA[
+;--------------------------------------------------------------------
+; NAME           : ${1:name}
+; BRIEF          : $2
+; DESCRIPTION    : $3
+;--------------------------------------------------------------------
+; PARAMETERS
+${4:;   ${5:P1%}          : ${6:description} }
+;--------------------------------------------------------------------
+N1 LPS ${1:name}
+${7:(ADR_PARA)}
+11 DIM $5
+;--------------------------------------------------------------------
+$0
+N1 PEND
+
+]]>
+</content>
+<tabTrigger>LPS</tabTrigger>
+<scope>source.mtx_npg</scope>
+</snippet>

@@ -1,0 +1,48 @@
+//--------------------------------------------------------------------
+// AUTOCOMPLETE program flow control structures
+//  - does not show up within control structure itself.
+//--------------------------------------------------------------------
+{
+	"scope": "meta.cpl.line.mtx_npg - meta.control - string - comment",
+	"completions": [
+	{
+		"trigger": "CASE\tCASE..OF..",
+		"contents":	"CASE ${1:VAR%} OF\n1 LABEL ${2:1}\n$0\n1 ENDCASE"
+	},
+	{
+		"trigger": "CASE_OTHERWISE\tCASE..OF..OTHERWISE",
+		"contents": "CASE ${1:VAR%} OF\n1 LABEL ${2:1}\n$0\n1 OTHERWISE\n\n1 ENDCASE"
+	},
+	{
+		"trigger": "IF_multi\tIF..THEN..ENDIF",
+		"contents":	"IF ${1:VAR%} THEN\n$0\n1 ENDIF"
+	},
+	{
+		"trigger": "IF_single\tIF..THEN..ENDIF",
+		"contents":	"IF ${1:VAR%} THEN $0 ENDIF"
+	},
+	{
+		"trigger": "IF_ELSE_multi\tIF..THEN..ELSE..ENDIF",
+		"contents":	"IF ${1:VAR%} THEN\n$0\n1 ELSE\n\n1 ENDIF"
+	},
+	{
+		"trigger": "IF_ELSE_single\tIF..THEN..ELSE..ENDIF",
+		"contents":	"IF ${1:VAR%} THEN $0 ELSE  ENDIF"
+	},
+	{
+		"trigger": "FOR\tFOR..TO..",
+		"contents":	"FOR ${1:VAR%}=${2:0} TO ${3:MAX%}\n$0\n1 NEXT $1"
+	},
+	{
+		"trigger": "FOR_STEP\tFOR..STEP..TO..",
+		"contents":	"FOR ${1:VAR%}=${2:0} STEP ${3:1} TO ${4:MAX%}\n$0\n1 NEXT $1"
+	},
+	{
+		"trigger": "WHILE\tWHILE..ENDWHILE",
+		"contents":	"WHILE ${1:VAR%}<${2:0}\n$0\n1 ENDWHILE"
+	},
+	{
+		"trigger": "REPEAT_UNTIL\tREPEAT..UNTIL",
+		"contents":	"REPEAT\n$0\n1 UNTIL ${1:VAR%}=${2:0}\n"
+	},
+]}

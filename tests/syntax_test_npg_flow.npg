@@ -1,0 +1,57 @@
+// SYNTAX TEST "Packages/CNC BoschRexroth MTX/mtx_npg.sublime-syntax"
+
+////////////////////////////////////////////////////
+// FLOW statements
+// Performance: -
+////////////////////////////////////////////////////
+
+$1		; Channel 1
+
+////////////////////////////////////////////////////
+// CPL single line IF ... THEN... ENDIF
+10 IF VAR? = TRUE THEN RET = COS(4.0) ENDIF
+
+////////////////////////////////////////////////////
+// CPL single line IF ... THEN... ENDIF
+10 IF VAR? = TRUE THEN : RET = COS(4.0) : ENDIF
+
+////////////////////////////////////////////////////
+// CPL single line IF ... THEN ... ELSE ... ENDIF
+10 IF VAR? = TRUE THEN RET = COS(4.0) ELSE RET = 0 ENDIF
+
+////////////////////////////////////////////////////
+// CPL single line IF ... THEN ... ELSE ... ENDIF
+10 IF VAR? = TRUE THEN : RET = COS(4.0) : ELSE : RET = 0 : ENDIF
+
+////////////////////////////////////////////////////
+// CPL single line IF ... THEN... ENDIF
+// calling a procedure, which must finalize a statement
+10 IF VAR? = TRUE THEN SETWARN(4.0) ELSE SETWARN(2) ENDIF
+
+////////////////////////////////////////////////////
+// CPL single line FOR ... STEP .. TO <stmt> NEXT
+10 FOR I%=0 STEP 2 TO 10 : SETWARN(1000+I%) : NEXT I%
+
+////////////////////////////////////////////////////
+// CPL goto statement
+10 GOTO .LBL1   REM comment
+
+////////////////////////////////////////////////////
+// CPL goto target
+10 .LBL1        REM comment
+
+////////////////////////////////////////////////////
+// DIN goto statement
+N10 GOA LBL1   (comment)
+
+////////////////////////////////////////////////////
+// DIN goto target
+N10 LBL1:      ; comment
+
+////////////////////////////////////////////////////
+// DIN repeated function call
+N10 REPEAT(12) (comment) P SubProgram(Key1 10, Var2 2)
+
+////////////////////////////////////////////////////
+// DIN repeated function call
+N10 REPEAT[count%] (comment) P SubProgram

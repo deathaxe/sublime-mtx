@@ -1,0 +1,27 @@
+// SYNTAX TEST "Packages/CNC BoschRexroth MTX/mtx_scs.sublime-syntax"
+
+; debug file
+dbg	dbg2.scs
+//<- keyword.control
+//  ^^^^^^^^ entity.name.file
+
+; use statement
+use	p2_lin.scs for (1,2,4)
+//<- keyword.control
+//  ^^^^^^^^^^ entity.name.file
+//             ^^^ keyword.control
+//                 ^ punctuation.arguments.begin
+//                  ^ constant.numeric
+//                   ^ punctuation.arguments.seperator
+//                    ^ constant.numeric
+//                     ^ punctuation.arguments.seperator
+//                      ^ constant.numeric
+//                       ^ punctuation.arguments.end
+
+; Data telegram
+P-0-1050.0.0 = (S-403,S-0-3132.0.0)
+
+P-0-026.0.0 = (0,0)
+
+P-0-026 = 0b01110101
+

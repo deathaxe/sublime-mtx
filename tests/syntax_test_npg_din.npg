@@ -1,0 +1,228 @@
+// SYNTAX TEST "Packages/CNC BoschRexroth MTX/mtx_npg.sublime-syntax"
+
+////////////////////////////////////////////////////
+// DIN
+// Performance: 0.5ms
+////////////////////////////////////////////////////
+
+G1 G53.2 F1000.5 X10 Y=AC(-30.5) Z = 40 + 10.0 S [spd%] T[PRETOOL%](comment) M10 M[Da%]
+
+[Gcode](NIPS) G53.2 X[x_pos](comment) [AX_Y%][POS_Y] (comment) Z500
+
+////////////////////////////////////////////////////
+// POSITIONS FOR AXIS X
+////////////////////////////////////////////////////
+N10 X1
+//  ^ support.variable.axis
+//   ^ constant.numeric
+N10 X 1
+//  ^ support.variable.axis
+//    ^ constant.numeric
+N10 X+1
+//  ^ support.variable.axis
+//   ^^ constant.numeric
+N10 X +1
+//  ^ support.variable.axis
+//    ^^ constant.numeric
+N10 X-1
+//  ^ support.variable.axis
+//   ^^ constant.numeric
+N10 X -1
+//  ^ support.variable.axis
+//    ^^ constant.numeric
+N10 X=1
+//  ^ support.variable.axis
+//   ^ keyword.operator.relational
+//    ^ constant.numeric
+N10 X = 1
+//  ^ support.variable.axis
+//    ^ keyword.operator.relational
+//      ^ constant.numeric
+N10 X1.
+//  ^ support.variable.axis
+//   ^^ constant.numeric
+N10 X 1.
+//  ^ support.variable.axis
+//    ^^ constant.numeric
+N10 X+1.
+//  ^ support.variable.axis
+//   ^^^ constant.numeric
+N10 X +1.
+//  ^ support.variable.axis
+//    ^^^ constant.numeric
+N10 X-1.
+//  ^ support.variable.axis
+//   ^^^ constant.numeric
+N10 X -1.
+//  ^ support.variable.axis
+//    ^^^ constant.numeric
+N10 X=1.
+//  ^ support.variable.axis
+//   ^ keyword.operator.relational
+//    ^^ constant.numeric
+N10 X = 1.
+//  ^ support.variable.axis
+//    ^ keyword.operator.relational
+//      ^^ constant.numeric
+N10 X1.523
+//  ^ support.variable.axis
+//   ^^^^^ constant.numeric
+N10 X 1.523
+//  ^ support.variable.axis
+//    ^^^^^ constant.numeric
+N10 X+1.523
+//  ^ support.variable.axis
+//   ^^^^^^ constant.numeric
+N10 X +1.523
+//  ^ support.variable.axis
+//    ^^^^^^ constant.numeric
+N10 X-1.523
+//  ^ support.variable.axis
+//   ^^^^^^ constant.numeric
+N10 X -1.523
+//  ^ support.variable.axis
+//    ^^^^^^ constant.numeric
+N10 X=1.523
+//  ^ support.variable.axis
+//   ^ keyword.operator.relational
+//    ^^^^^ constant.numeric
+N10 X = 1.523
+//  ^ support.variable.axis
+//    ^ keyword.operator.relational
+//      ^^^^^ constant.numeric
+N10 X[speed%]
+//  ^ support.variable.axis
+//   ^ punctuation.cpl.begin
+//    ^^^^^ meta.cpl
+//          ^ punctuation.cpl.end
+
+////////////////////////////////////////////////////
+// POSITIONS FOR AXIS X2
+////////////////////////////////////////////////////
+N10 X2 1.523
+//  ^^ support.variable.axis
+//     ^^^^^ constant.numeric
+N10 X2+1.523
+//  ^^ support.variable.axis
+//     ^^^^^ constant.numeric
+N10 X2 +1.523
+//  ^^ support.variable.axis
+//      ^^^^^ constant.numeric
+N10 X2-1.523
+//  ^^ support.variable.axis
+//     ^^^^^ constant.numeric
+N10 X2 -1.523
+//  ^^ support.variable.axis
+//      ^^^^^ constant.numeric
+N10 X2=1.523
+//  ^^ support.variable.axis
+//    ^ keyword.operator.relational
+//     ^^^^^ constant.numeric
+N10 X2 = 1.523
+//  ^^ support.variable.axis
+//     ^ keyword.operator.relational
+//       ^^^^^ constant.numeric
+N10 X2[1.523]
+//  ^^ support.variable.axis
+//    ^ punctuation.cpl.begin
+//     ^^^^^ meta.cpl
+//     ^^^^^ constant.numeric
+//          ^ punctuation.cpl.end
+
+////////////////////////////////////////////////////
+// MAIN SPINDLE speed
+////////////////////////////////////////////////////
+N10 S1000
+//  ^ support.variable.param
+//   ^ constant.numeric
+N10 S 1000
+//  ^ support.variable.param
+//    ^ constant.numeric
+N10 S=1000
+//  ^ support.variable.param
+//   ^ keyword.operator.relational
+//    ^ constant.numeric
+N10 S = 1000
+//  ^ support.variable.param
+//    ^ keyword.operator.relational
+//      ^ constant.numeric
+N10 S1000.
+//  ^ support.variable.param
+//   ^^ constant.numeric
+N10 S 1000.
+//  ^ support.variable.param
+//    ^^ constant.numeric
+N10 S=1000.
+//  ^ support.variable.param
+//   ^ keyword.operator.relational
+//    ^ constant.numeric
+N10 S = 1000.
+//  ^ support.variable.param
+//    ^ keyword.operator.relational
+//      ^ constant.numeric
+N10 S1000.5
+//  ^ support.variable.param
+//   ^^^^^ constant.numeric
+N10 S 1000.5
+//  ^ support.variable.param
+//    ^^^^^ constant.numeric
+N10 S=1000.5
+//  ^ support.variable.param
+//   ^ keyword.operator.relational
+//    ^^^^^ constant.numeric
+N10 S = 1000.5
+//  ^ support.variable.param
+//    ^ keyword.operator.relational
+//      ^^^^^ constant.numeric
+N10 S[speed%]
+//  ^ support.variable.param
+//   ^ punctuation.cpl.begin
+//    ^^^^^ meta.cpl
+//          ^ punctuation.cpl.end
+
+////////////////////////////////////////////////////
+// 2ND SPINDLE speed
+////////////////////////////////////////////////////
+N10 S2=1.523
+//  ^^ support.variable.param
+//    ^ keyword.operator.relational
+//     ^^^^^ constant.numeric
+N10 S2 = 1.523
+//  ^^ support.variable.param
+//     ^ keyword.operator.relational
+//       ^^^^^ constant.numeric
+N10 S2[1.523]
+//  ^^ support.variable.param
+//    ^ punctuation.cpl.begin
+//     ^^^^^ meta.cpl
+//          ^ punctuation.cpl.end
+N10 S[speed%][1.523]
+//  ^ support.variable.param
+//   ^ punctuation.cpl.begin
+//    ^^^^^^ meta.cpl
+//          ^ punctuation.cpl.end
+//           ^ punctuation.cpl.begin
+//            ^^^^^ meta.cpl
+//                 ^ punctuation.cpl.end
+// G94 DeltaSpeed
+N10 DS1000
+//  ^^  support.variable.param
+//    ^ constant.numeric
+
+////////////////////////////////////////////////////
+// AXIS speed
+////////////////////////////////////////////////////
+N10 F1000
+//  ^ support.variable.param
+//   ^ constant.numeric
+// F2 speed
+N10 F2=2000
+//  ^^ support.variable.param
+//     ^ constant.numeric
+// asynchronous axis speed
+N10 FA1000
+//  ^^ support.variable.param
+//    ^ constant.numeric
+
+
+

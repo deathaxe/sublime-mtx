@@ -1,0 +1,388 @@
+// SYNTAX TEST "Packages/CNC BoschRexroth MTX/mtx_npg.sublime-syntax"
+
+////////////////////////////////////////////////////
+// SUBPROGRAM calls
+// This file contains tests for the hundreds of more
+// or less stupid possibilities to make a function
+// or subprogram call.
+// REMARK: This is Bosch Rexroth MTX DIN/CPL hell!!!
+// Performance: 1.0ms
+////////////////////////////////////////////////////
+// DIN message output to HMI
+N10 MSG(unquoted message string)
+//                             <- meta.din.line
+//  ^ support.function
+//     ^ punctuation.arguments.begin
+//      ^^^^^^^^ string.unquoted
+//                             ^ punctuation.arguments.end
+N10 MSG("quoted message string")
+//                             <- meta.din.line
+//  ^ support.function
+//     ^ punctuation.arguments.begin
+//      ^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.double
+//                             ^ punctuation.arguments.end
+////////////////////////////////////////////////////
+// DIN predefined function with DIN keys DIN values
+N10 KvProg(X1.2,Y1.4,Z1.6)			; comment
+//                       <- meta.din.line
+//  ^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//  ^ support.function
+//        ^ punctuation.arguments.begin
+//         ^^^^^^^^^^^^^^ meta.arguments
+//         ^ variable.parameter
+//          ^^^ constant.numeric
+//             ^ punctuation.arguments.seperator
+//              ^ variable.parameter
+//               ^^^ constant.numeric
+//                  ^ punctuation.arguments.seperator
+//                   ^ variable.parameter
+//                    ^^^ constant.numeric
+//                       ^ punctuation.arguments.end
+// DIN predefined function with DIN key CPL value
+N10 KvProg(X[X_VAL])						; comment
+//                 <- meta.din.line
+//  ^^^^^^^^^^^^^^^^ meta.function-call
+//  ^ support.function
+//        ^ punctuation.arguments.begin
+//         ^^^^^^^^ meta.arguments
+//         ^ variable.parameter
+//          ^ punctuation.cpl.begin
+//           ^^^^^ meta.cpl
+//           ^^^^^ variable.other
+//                ^ punctuation.cpl.end
+//                 ^ punctuation.arguments.end
+// DIN predefined function with CPL key CPL value
+N10 KvProg([AX_NAME$][X_VAL])		; comment
+//                          <- meta.din.line
+//  ^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//  ^ support.function
+//        ^ punctuation.arguments.begin
+//         ^^^^^^^^^^^^^^^^^ meta.arguments
+//         ^ punctuation.cpl.begin
+//          ^^^^^^^^ meta.cpl
+//          ^^^^^^^^ variable.other
+//                  ^ punctuation.cpl.end
+//                   ^ punctuation.cpl.begin
+//                    ^^^^^ meta.cpl
+//                    ^^^^^ variable.other
+//                         ^ punctuation.cpl.end
+//                          ^ punctuation.arguments.end
+////////////////////////////////////////////////////
+// DIN local subprogram definition (DIN)
+N1 LPS UP ; comment
+//      <- meta.din.line
+// ^^^ keyword.definition.function.begin
+//     ^^ entity.name.function
+//        ^ comment.line
+N2 (DIN)
+// ^^^^^ string.pragma
+N2 (CPL)
+// ^^^^^ string.pragma
+N2 (ADR_PARA)
+// ^^^^^^^^^^ string.pragma
+////////////////////////////////////////////////////
+// DIN local subprogram definition ending
+N1 PEND ; comment
+// ^^^^ keyword.definition.function.end
+//      ^ comment.line
+////////////////////////////////////////////////////
+// CPL subprogram call with CPL-parameterlist
+//   The arguments are accessed by P1,P2,... by the
+//   subprogram code in this case.
+//   All arguments must be passed to the subprogram!
+10 CALL UP[10,"no REM comment"] CPL : REM comment
+//                                <- meta.cpl.line
+// ^^^^ keyword.control.flow
+//      ^^ entity.name.program
+//        ^ punctuation.arguments.begin
+//             ^^^^^^^^^^^^^^ string.quoted.double
+//                            ^ punctuation.arguments.end
+//                              ^^^ storage.type.modifier
+//                                  ^^^^^^^^^^^^^ invalid.illegal
+////////////////////////////////////////////////////
+// CPL subprogram call with named parameter list
+//   The arguments are accessed by P1,P2,... by the
+//   subprogram code in this case.
+10 CALL UP(10,"no REM comment") CPL REM comment
+//                                <- meta.cpl.line
+// ^^^^ keyword.control.flow
+//      ^^ entity.name.program
+//        ^ punctuation.arguments.begin
+//             ^^^^^^^^^^^^^^ string.quoted.double
+//                            ^ punctuation.arguments.end
+//                              ^^^ storage.type.modifier
+//                                  ^^^^^^^^^^^ comment.line
+////////////////////////////////////////////////////
+// CPL subprogram call with named parameter list
+//   The arguments are accessed by the predefined
+//   names 'VAR1' and 'VAR2' by the subprogram
+//   code in this case.
+10 CALL UP(VAR1 10, VAR2 "no REM comment") CPL REM comment
+//                                           <- meta.cpl.line
+// ^^^^ keyword.control.flow
+//      ^^ entity.name.program
+//        ^ punctuation.arguments.begin
+//         ^^^^ variable.parameter
+//              ^^ constant.numeric
+//                ^ punctuation.arguments.seperator
+//                  ^^^^ variable.parameter
+//                        ^^^^^^^^^^^^^^ string.quoted.double
+//                                       ^ punctuation.arguments.end
+//                                         ^^^ storage.type.modifier
+//                                             ^^^^^^^^^^^ comment.line
+// simple arithmetic CPL expressions are allowed
+10 CALL UP(VAR1 = 10 * SQRT(SD(4))) CPL REM comment
+//                                    <- meta.cpl.line
+// ^^^^ keyword.control.flow
+//      ^^ entity.name.program
+//        ^ punctuation.arguments.begin
+//         ^^^^ variable.parameter
+//              ^ keyword.operator.relational
+//                ^^ constant.numeric
+//                   ^ keyword.operator.arithmetic
+//                     ^^^^ support.function.cpl
+//                         ^ punctuation.arguments.begin
+//                          ^^ support.function.cpl
+//                            ^ punctuation.arguments.begin
+//                             ^ constant.numeric
+//                              ^^^ punctuation.arguments.end
+//                                  ^^^ storage.type.modifier
+//                                      ^^^^^^^^^^^ comment.line
+////////////////////////////////////////////////////
+// DIN subprogram call
+//  - with P
+//  - program name string
+//  - DIN address list arguments
+//    - without using argument names
+//    - and DIN constant values
+N1 P Prog(-10 + 2, "no ; comment") DIN (block comment)
+//                                  <- meta.din.line
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//        ^^^^^^^^^^^^^^^^^^^^^^^ meta.arguments
+// ^ keyword.control.flow
+//   ^^^^ entity.name.program
+//       ^ punctuation.arguments.begin
+//        ^^^ constant.numeric
+//            ^ keyword.operator.arithmetic
+//              ^ constant.numeric
+//               ^ punctuation.arguments.seperator
+//                  ^^^^^^^^^^^^ string.quoted.double
+//                               ^ punctuation.arguments.end
+//                                 ^^^ storage.type.modifier
+//                                     ^^^^^^^^^^^^^^^ comment.block
+////////////////////////////////////////////////////
+// DIN subprogram call
+//  - with P
+//  - program name string
+//  - DIN address list arguments
+//    - using argument names
+//    - and DIN constant values
+N1 P Prog(KEY 10, STR="string") CPL (block comment)
+//                                <- meta.din.line
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//        ^^^^^^^^^^^^^^^^^^^^ meta.arguments
+// ^ keyword.control.flow
+//   ^^^^ entity.name.program
+//       ^ punctuation.arguments.begin
+//        ^^^ variable.parameter
+//            ^^ constant.numeric
+//              ^ punctuation.arguments.seperator
+//                ^^^ variable.parameter
+//                   ^ keyword.operator.relational
+//                    ^^^^^^^^ string.quoted.double
+//                            ^ punctuation.arguments.end
+//                              ^^^ storage.type.modifier
+//                                  ^^^^^^^^^^^^^^^ comment.block
+N1 P Prog(KEY 10 + COS(@2)) CPL (block comment)
+//                            <- meta.din.line
+// ^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//        ^^^^^^^^^^^^^^^^ meta.arguments
+// ^ keyword.control.flow
+//   ^^^^ entity.name.program
+//       ^ punctuation.arguments.begin
+//        ^^^ variable.parameter
+//            ^^ constant.numeric
+//               ^ keyword.operator.arithmetic
+//                 ^^^ support.function
+//                    ^ punctuation.arguments.begin
+//                     ^^ variable.other
+//                       ^^ punctuation.arguments.end
+//                          ^^^ storage.type.modifier
+//                              ^^^^^^^^^^^^^^^ comment.block
+////////////////////////////////////////////////////
+// DIN subprogram call
+//  - with P
+//  - program name string
+//  - DIN address list arguments
+//    - using argument names
+//    - and embedded CPL value with CPL functions
+N1 P Prog(KEY [SD.SETUP.SEC[MySec%+SIN(10)]]) (block comment)
+//                                          <- meta.din.line
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.arguments
+// ^ keyword.control.flow
+//   ^^^^ entity.name.program
+//       ^ punctuation.arguments.begin
+//        ^^^ variable.parameter
+//            ^ punctuation.cpl.begin
+//             ^^ support.variable.class
+//               ^ punctuation.member.seperator
+//                ^^^^^ entity.other.attribute-name
+//                     ^ punctuation.member.seperator
+//                      ^^^ entity.other.attribute-name
+//                         ^ punctuation.arguments.begin
+//                          ^^^^^^ variable.other
+//                                ^ keyword.operator.arithmetic
+//                                 ^^^ support.function
+//                                    ^ punctuation.arguments.begin
+//                                     ^^ constant.numeric
+//                                       ^^ punctuation.arguments.end
+//                                         ^ punctuation.cpl.end
+//                                          ^ punctuation.arguments.end
+//                                            ^^^^^^^^^^^^^^^ comment.block
+////////////////////////////////////////////////////
+// DIN subprogram call
+//  - with P
+//  - program name from CPL variable
+//  - DIN address list arguments
+//    - using argument names
+//    - and embedded CPL value
+N1 P [ Prog$ ] ( KEY [ SD.SETUP ] ) (block comment)
+//                                <- meta.din.line
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//              ^^^^^^^^^^^^^^^^^^ meta.arguments
+// ^ keyword.control.flow
+//   ^ punctuation.cpl.begin
+//     ^^^^^ variable.other
+//           ^ punctuation.cpl.end
+//             ^ punctuation.arguments.begin
+//               ^^^ variable.parameter
+//                   ^ punctuation.cpl.begin
+//                     ^^ support.variable.class
+//                       ^ punctuation.member.seperator
+//                        ^^^^^ entity.other.attribute-name
+//                              ^ punctuation.cpl.end
+//                                ^ punctuation.arguments.end
+//                                  ^^^^^^^^^^^^^^^ comment.block
+////////////////////////////////////////////////////
+// DIN subprogram call
+//  - without P
+//  - program name sting
+//  - DIN address list arguments
+//    - using argument names
+//    - and DIN constant values
+N1 Prog(KEY 10, STR="string" (comment) ) CPL (block comment)
+//                                         <- meta.din.line
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.arguments
+// ^^^^ entity.name.program
+//     ^ punctuation.arguments.begin
+//      ^^^ variable.parameter
+//          ^^ constant.numeric
+//            ^ punctuation.arguments.seperator
+//              ^^^ variable.parameter
+//                 ^ keyword.operator.relational
+//                  ^^^^^^^^ string.quoted.double
+//                           ^^^^^^^^^ comment.block
+//                                     ^ punctuation.arguments.end
+//                                       ^^^ storage.type.modifier
+//                                           ^^^^^^^^^^^^^^^ comment.block
+////////////////////////////////////////////////////
+// DIN subprogram call
+//  - without P
+//  - program name sting
+//  - DIN address list arguments
+//    - using argument names
+//    - and embedded CPL value
+N1 Prog(KEY [SD.SETUP] (comment)) (block comment)
+//                              <- meta.din.line
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//      ^^^^^^^^^^^^^^^^^^^^^^^^ meta.arguments
+// ^^^^ entity.name.program
+//     ^ punctuation.arguments.begin
+//      ^^^ variable.parameter
+//          ^ punctuation.cpl.begin
+//           ^^ support.variable.class
+//             ^ punctuation.member.seperator
+//              ^^^^^ entity.other.attribute-name
+//                   ^ punctuation.cpl.end
+//                     ^^^^^^^^^ comment.block
+//                              ^ punctuation.arguments.end
+//                                ^^^^^^^^^^^^^^^ comment.block
+////////////////////////////////////////////////////
+// DIN subprogram call
+//  - without P
+//  - program name from CPL variable
+//  - DIN address list arguments
+//    - using argument names
+//    - and embedded CPL value
+N1 [Prog$](KEY[SD.SETUP] (comment) ) CPL (block comment)
+//                                     <- meta.din.line
+//         ^^^^^^^^^^^^^^^^^^^^^^^^ meta.arguments
+// ^ punctuation.cpl.begin
+//  ^^^^^ variable.other
+//       ^ punctuation.cpl.end
+//        ^ punctuation.arguments.begin
+//         ^^^ variable.parameter
+//            ^ punctuation.cpl.begin
+//             ^^ support.variable.class
+//               ^ punctuation.member.seperator
+//                ^^^^^ entity.other.attribute-name
+//                     ^ punctuation.cpl.end
+//                       ^^^^^^^^^ comment.block
+//                                 ^ punctuation.arguments.end
+//                                   ^^^ storage.type.modifier
+//                                       ^^^^^^^^^^^^^^^ comment.block
+////////////////////////////////////////////////////
+// DIN subprogram call
+//  - without P
+//  - program name sting
+//  - DIN address list arguments
+//    - not using argument names
+//    - and directly access CPL value
+N1 Prog(intValue%(2) (comment)) (block comment)
+//                            <- meta.din.line
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//      ^^^^^^^^^^^^^^^^^^^^^^ meta.arguments
+// ^^^^ entity.name.program
+//     ^ punctuation.arguments.begin
+//      ^^^^^^^^^ variable.other
+//                   ^^^^^^^^^ comment.block
+//                            ^ punctuation.arguments.end
+//                              ^^^^^^^^^^^^^^^ comment.block
+N1 Prog(SD.SETUP (comment)) (block comment)
+//                        <- meta.din.line
+// ^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//      ^^^^^^^^^^^^^^^^^^ meta.arguments
+// ^^^^ entity.name.program
+//     ^ punctuation.arguments.begin
+//      ^^ support.variable.class
+//        ^ punctuation.member.seperator
+//         ^^^^^ entity.other.attribute-name
+//               ^^^^^^^^^ comment.block
+//                        ^ punctuation.arguments.end
+//                          ^^^^^^^^^^^^^^^ comment.block
+////////////////////////////////////////////////////
+// DIN repeated subprogram call
+//  - with static repeat count
+N1 REPEAT(12) (comment) P SubProgram(Key1 10, Var2 2)
+// ^^^^^^^^^^^^^^^^^^^^^ meta.control
+//                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+// ^^^^^^ keyword.control.flow
+//       ^ punctuation.arguments.begin
+//          ^ punctuation.arguments.end
+//            ^^^^^^^^^ comment.block
+//                      ^ keyword.control.flow
+//                                  ^ punctuation.arguments.begin
+//                                                  ^ punctuation.arguments.end
+////////////////////////////////////////////////////
+// DIN repeated subprogram call
+//  - with dynamic repeat count
+N1 REPEAT[count%] (comment) P SubProgram CPL
+// ^^^^^^^^^^^^^^^^^^^^^^^^^ meta.control
+//                          ^^^^^^^^^^^^^^^^ meta.function-call
+// ^^^^^^ keyword.control.flow
+//       ^ punctuation.arguments.begin
+//                ^^^^^^^^^ comment.block
+//                          ^ keyword.control.flow
+

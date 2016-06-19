@@ -1,0 +1,72 @@
+// SYNTAX TEST "Packages/CNC BoschRexroth MTX/mtx_npg.sublime-syntax"
+
+////////////////////////////////////////////////////
+// COMMENT tests
+// Performance: 0.2ms
+////////////////////////////////////////////////////
+
+; comment line with semicolon
+// <- comment.line
+
+// comment line with double slash
+// <- comment.doc
+
+/N1 disabled DIN block with single slash
+// <-^^^^^^^^^^^^^^^^^ comment.disabled
+
+/10 disabled CPL block with single slash
+// <-^^^^^^^^^^^^^^^^^ comment.disabled
+
+(N1 DIN block commented out by parentheses)
+// <-^^^^^^^^^ comment.block
+(10 CPL block commented out by parentheses)
+// <-^^^^^^^^^ comment.block
+
+N1 (DIN) ; not a comment but a pragma
+// ^^^^^ string.pragma.source-type
+//       ^^^^^ comment.line
+N1 (CPL) // not a comment but a pragma
+// ^^^^^ string.pragma.source-type
+//       ^^^^^ comment.doc
+N1 (ADR_PARA) / slash starts no comment here
+// ^^^^^^^^^^ string.pragma.din-arguments
+//            ^^^^^^^^ invalid.illegal
+
+G0 //comment\\ X0 Y0
+// ^^^^^^^^^^^ comment.doc
+
+G1([@2]) (comment) F1000
+//       ^^^^^^^^^ comment.block
+
+G1([@2]) //comment\\ F1000 // comment 2 \\
+//       ^^^^^^^^^^^ comment.doc
+//                         ^^^^^^^^^^^^^^^ comment.doc
+
+KVP(0.4 (comment with parenthes F(x)=10)) ; comment
+//      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.block
+//                                        ^^^^^^^^^ comment.line
+
+KVP(0.4 //comment with parenthes F(x)=10\\) ; comment
+//      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.doc
+//                                          ^^^^^^^^^ comment.line
+
+// not a comment but a message for hmi
+(MSG, message text)
+// <- comment.msg.mtx_npg
+//    ^^^^^^^^^^^^ string.unquoted.msg
+//                ^ comment.msg
+
+1 @2 = 5 REM comment
+//       ^^^^^^^^^^^ comment.line
+
+// comments do not start in quoted strings but at the end
+10 CALL TEST[10,"no REM comment"] REM comment is allowed after CALL
+//               ^^^^^^^^^^^^^^  string.quoted.double
+//                                ^^^^^ comment.line
+// CALL statement must be the only one in row
+10 CALL TEST[10,"no REM comment"] : REM colon not allowed after CALL
+//                                ^^^^^ invalid.illegal
+// REM not allowed in DIN statements
+N1 TEST(10,10) REM CPL comment not allowed in DIN block
+//             ^^^ invalid.illegal
+
