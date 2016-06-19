@@ -53,6 +53,3 @@ settings.
 - "use_tab_stops": false
 
 They are all required to ensure NC will read the resulting file correctly.
-
-### License
-[Copyright &copy; 2016 DeathAxe](https://github.com/deathaxe/sublime-mtx/blob/stable/LICENSE)
