@@ -25,7 +25,7 @@ Once you install Package Control, restart Sublime Text and bring up the Command 
 
 **With Git:** Clone the repository in your Sublime Text Packages directory, located somewhere in user's "Home" directory::
 
-    git clone git://github.com/deathaxe/sublime-mtx.git
+    git clone git://github.com/deathaxe/sublime-mtx.git "CNC BoschRexroth MTX"
 
 
 The "Packages" packages directory is located differently in different platforms. To access the directory use:
@@ -55,4 +55,4 @@ settings.
 They are all required to ensure NC will read the resulting file correctly.
 
 ### License
-[Copyright &copy; 2016 DeathAxe](https://github.com/deathaxe/sublime-mtx/blob/stable/LICENSE.md)
+[Copyright &copy; 2016 DeathAxe](https://github.com/deathaxe/sublime-mtx/blob/stable/LICENSE)
