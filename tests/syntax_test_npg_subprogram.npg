@@ -22,13 +22,13 @@ N10 MSG("quoted message string")
 //      ^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.double
 //                             ^ punctuation.arguments.end
 ////////////////////////////////////////////////////
-// DIN predefined function with DIN keys DIN values
+// DIN predefined function with DIN argument list, DIN keys & DIN values
 N10 KvProg(X1.2,Y1.4,Z1.6)			; comment
 //                       <- meta.din.line
 //  ^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//         ^^^^^^^^^^^^^^ meta.arguments
 //  ^ support.function
 //        ^ punctuation.arguments.begin
-//         ^^^^^^^^^^^^^^ meta.arguments
 //         ^ variable.parameter
 //          ^^^ constant.numeric
 //             ^ punctuation.arguments.seperator
@@ -38,26 +38,26 @@ N10 KvProg(X1.2,Y1.4,Z1.6)			; comment
 //                   ^ variable.parameter
 //                    ^^^ constant.numeric
 //                       ^ punctuation.arguments.end
-// DIN predefined function with DIN key CPL value
+// DIN predefined function with DIN argument list, DIN key & CPL value
 N10 KvProg(X[X_VAL])						; comment
 //                 <- meta.din.line
 //  ^^^^^^^^^^^^^^^^ meta.function-call
+//         ^^^^^^^^ meta.arguments
 //  ^ support.function
 //        ^ punctuation.arguments.begin
-//         ^^^^^^^^ meta.arguments
 //         ^ variable.parameter
 //          ^ punctuation.cpl.begin
 //           ^^^^^ meta.cpl
 //           ^^^^^ variable.other
 //                ^ punctuation.cpl.end
 //                 ^ punctuation.arguments.end
-// DIN predefined function with CPL key CPL value
+// DIN predefined function with DIN argument list, CPL key & CPL value
 N10 KvProg([AX_NAME$][X_VAL])		; comment
 //                          <- meta.din.line
 //  ^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//         ^^^^^^^^^^^^^^^^^ meta.arguments
 //  ^ support.function
 //        ^ punctuation.arguments.begin
-//         ^^^^^^^^^^^^^^^^^ meta.arguments
 //         ^ punctuation.cpl.begin
 //          ^^^^^^^^ meta.cpl
 //          ^^^^^^^^ variable.other
@@ -67,6 +67,22 @@ N10 KvProg([AX_NAME$][X_VAL])		; comment
 //                    ^^^^^ variable.other
 //                         ^ punctuation.cpl.end
 //                          ^ punctuation.arguments.end
+// DIN predefined function with CPL argument list
+N10 SSDE[SD.Data[10] = @1]
+//                       <- meta.din.line
+//  ^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//       ^^^^^^^^^^^^^^^^ meta.arguments
+//  ^^^^ support.function
+//      ^ punctuation.arguments.begin
+//       ^^ support.variable.class
+//         ^ punctuation.member.seperator
+//          ^^^^ entity.other.attribute-name
+//              ^ punctuation.arguments.begin
+//               ^^ constant.numeric
+//                 ^ punctuation.arguments.end
+//                   ^ keyword.operator.relational
+//                     ^^ variable.other
+//                       ^ punctuation.arguments.end
 ////////////////////////////////////////////////////
 // DIN local subprogram definition (DIN)
 N1 LPS UP ; comment
@@ -385,4 +401,3 @@ N1 REPEAT[count%] (comment) P SubProgram CPL
 //       ^ punctuation.arguments.begin
 //                ^^^^^^^^^ comment.block
 //                          ^ keyword.control.flow
-

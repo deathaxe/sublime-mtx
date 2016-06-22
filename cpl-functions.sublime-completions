@@ -71,6 +71,8 @@
 {"trigger":"ROUND\tFUNC","contents":"ROUND($0)"},
 {"trigger":"SCS3\tFUNC","contents":"SCS3($0)"},
 {"trigger":"SCS3L\tFUNC","contents":"SCS3L($0)"},
+{"trigger":"SCS\tFUNC","contents":"SCS($0)"},
+{"trigger":"SCSL\tFUNC","contents":"SCSL($0)"},
 {"trigger":"SD\tFUNC","contents":"SD($0)"},
 {"trigger":"SDLOAD\tFUNC","contents":"SDLOAD($0)"},
 {"trigger":"SDR\tFUNC","contents":"SDR($0)"},
