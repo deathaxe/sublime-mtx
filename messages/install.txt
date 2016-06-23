@@ -1,0 +1,23 @@
+
+######################### CNC BoschRexroth MTX #########################
+
+  VERSION 1.0.0
+
+  This package provides syntax highlighting support for the
+  Bosch Rexroth MTX Numerical Control to the SublimeText 3 Editor.
+
+  FEATURES
+  - NC cycles (*.prg *.npg *.cpl)
+    - syntax highlighting
+      - ISO G-Code
+      - CPL highlevel commands
+      - known NC functions and commands
+    - symbols for
+      - LPS: local subprograms
+      - LBL: labels (goto targets)
+    - auto completion for the most common DIN/CPL functions
+
+  - Sercos Settings Files (*.scs)
+    - syntax highlighting
+
+########################################################################
