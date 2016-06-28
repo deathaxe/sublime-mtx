@@ -247,12 +247,12 @@ contexts:
       scope: meta.function-call.mtx_npg keyword.control.flow.mtx_npg
       set:
         - meta_content_scope: meta.din.line.mtx_npg meta.function-call.mtx_npg
-        - match: '\b[\w\.]+\b'
+        - match: '[\w\./]+\b'
           scope: entity.name.program.mtx_npg
           set: din-subprogram-args
         - include: din-stmt-cplprog
         - include: din-stmt-end
-    - match: '[\w\.]+\b'
+    - match: '[\w\./]+\b'
       scope: meta.function-call.mtx_npg entity.name.program.mtx_npg
       set: din-subprogram-args
     - include: din-stmt-cplprog
@@ -698,7 +698,6 @@ contexts:
     - match: \bREM\b.*$
       scope: comment.line.mtx_npg
       pop: true
-    - include: din-comment-line
 
   cpl-constants:
     - include: strings
