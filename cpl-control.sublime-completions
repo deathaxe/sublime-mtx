@@ -38,8 +38,8 @@
 		"contents":	"FOR ${1:VAR%}=${2:0} STEP ${3:1} TO ${4:MAX%}\n$0\n1 NEXT $1"
 	},
 	{
-		"trigger": "WHILE\tWHILE..ENDWHILE",
-		"contents":	"WHILE ${1:VAR%}<${2:0}\n$0\n1 ENDWHILE"
+		"trigger": "WHILE\tWHILE..DO..END",
+		"contents":	"WHILE ${1:VAR%}<${2:0} DO\n$0\n1 END"
 	},
 	{
 		"trigger": "REPEAT_UNTIL\tREPEAT..UNTIL",
