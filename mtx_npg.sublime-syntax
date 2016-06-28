@@ -698,6 +698,9 @@ contexts:
     - match: \bREM\b.*$
       scope: comment.line.mtx_npg
       pop: true
+    - match: ;.*$
+      scope: invalid.illegal.mtx_npg
+      pop: true
 
   cpl-constants:
     - include: strings
