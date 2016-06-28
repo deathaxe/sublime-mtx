@@ -1,6 +1,3 @@
-
-######################### CNC BoschRexroth MTX #########################
-
   VERSION 1.0.0
 
   This package provides syntax highlighting support for the
@@ -19,5 +16,3 @@
 
   - Sercos Settings Files (*.scs)
     - syntax highlighting
-
-########################################################################

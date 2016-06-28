@@ -1,14 +1,11 @@
-
-######################### CNC BoschRexroth MTX #########################
-
   VERSION 1.0.1
 
   CHANGES
   * allow CPL argument list with DIN functions
   * allow negativ DIN parameter values (e.g.: J-100)
-  * WHILE loops end with END instead of ENDWHILE
+  * fixed WHILE .. DO .. END loop
   + added SCS and SCSL function for older controls
   + added support for structured variables (SV)
   * cleaned letter pattern for labels and parameter recognition
-
-########################################################################
+  * allow path in program call blocks (e.g. P /feprom/cycles/cycle.npg)
+  * mark DIN comment as invalid in CPL blocks
