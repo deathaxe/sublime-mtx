@@ -113,6 +113,7 @@ contexts:
       push: after-operators
 
   after-operators:
+    - include: cpl-group-set
     - match: '{{sign}}'
       scope: constant.numeric.mtx_npg
       pop: true
@@ -652,6 +653,18 @@ contexts:
     - match: \(
       scope: punctuation.group.begin.mtx_npg
       push:
+        - match: '{{sign}}'
+          scope: constant.numeric.mtx_npg
+          set:
+            - match: \)
+              scope: punctuation.group.end.mtx_npg
+              pop: true
+            - include: cpl-expressions
+
+  cpl-group-set:
+    - match: \(
+      scope: punctuation.group.begin.mtx_npg
+      set:
         - match: '{{sign}}'
           scope: constant.numeric.mtx_npg
           set:
