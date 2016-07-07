@@ -401,3 +401,14 @@ N1 REPEAT[count%] (comment) P SubProgram CPL
 //       ^ punctuation.arguments.begin
 //                ^^^^^^^^^ comment.block
 //                          ^ keyword.control.flow
+////////////////////////////////////////////////////
+// CPL PRN# function
+11 PRN#(1,"Format: ###.##", DATE;)
+//                                <- meta.cpl.line
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
+//      ^^^^^^^^^^^^^^^^^^^^^^^^^ meta.arguments
+// ^^^^ support.function.cpl
+//     ^ punctuation.arguments.begin
+//        ^^^^^^^^^^^^^^^^ string.quoted.double
+//                              ^ operator.skip-lf
+//                               ^ punctuation.arguments.end

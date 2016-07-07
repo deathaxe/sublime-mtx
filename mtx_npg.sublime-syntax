@@ -678,10 +678,11 @@ contexts:
     - match: \(
       scope: punctuation.arguments.begin.mtx_npg
       push:
+        - meta_content_scope: meta.arguments.mtx_npg
         - match: '{{sign}}'
           scope: constant.numeric.mtx_npg
           set:
-            - meta_scope: meta.arguments.mtx_npg
+            - meta_content_scope: meta.arguments.mtx_npg
             - match: \)
               scope: punctuation.arguments.end.mtx_npg
               set:
@@ -695,10 +696,11 @@ contexts:
     - match: \[
       scope: punctuation.arguments.begin.mtx_npg
       push:
+        - meta_content_scope: meta.arguments.mtx_npg
         - match: '{{sign}}'
           scope: constant.numeric.mtx_npg
           set:
-            - meta_scope: meta.arguments.mtx_npg
+            - meta_content_scope: meta.arguments.mtx_npg
             - match: \]
               scope: punctuation.arguments.end.mtx_npg
               set:
@@ -759,8 +761,26 @@ contexts:
         - include: scope-end
 
   cpl-functions:
-    # functions with stupid endings see R911342633_02 P.605ff.
-    - match: (?:AXADR|CHR|MID|STR|TRIM|VERSINF)\$|(?:INP|PRN)#
+
+    # file input/output see R911342633_02 P.577ff. (7.5.4)
+    - match: (INP#|PRN#)\s*(\()
+      captures:
+        1: support.function.cpl.mtx_npg
+        2: punctuation.arguments.begin.mtx_npg
+      push:
+        - meta_scope: meta.function-call.mtx_npg
+        - meta_content_scope: meta.arguments.mtx_npg
+        - match: \)
+          scope: punctuation.arguments.end.mtx_npg
+          pop: true
+        # ; means: do not add LF to output text
+        - match: ;
+          scope: operator.skip-lf.mtx_npg
+        - include: operators-seperator
+        - include: cpl-expressions
+
+    # string functions with stupid endings see R911342633_02 P.605ff.
+    - match: (?:AXADR|CHR|MID|STR|TRIM|VERSINF)\$
       scope: support.function.cpl.mtx_npg
       push:
         - meta_scope: meta.function-call.mtx_npg
