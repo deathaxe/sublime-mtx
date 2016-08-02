@@ -1,0 +1,5 @@
+  VERSION 1.0.2
+
+  CHANGES
+  * FIXED semicolon in INP# and PRN# functions indicates not to add a line feed.
+  * FIXED CPL variables must contain only capital letters.
