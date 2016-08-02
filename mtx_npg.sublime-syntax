@@ -734,7 +734,7 @@ contexts:
       scope: constant.language.mtx_npg
 
   cpl-variables:
-    - match: '[@#]?\w+[%$?!]?'
+    - match: '[@#]?[A-Z][A-Z0-9_]+[%$?!]?'
       scope: variable.other.mtx_npg
       push:
         - meta_scope: meta.variable.mtx_npg

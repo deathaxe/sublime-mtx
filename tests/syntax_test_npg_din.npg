@@ -5,7 +5,7 @@
 // Performance: 0.5ms
 ////////////////////////////////////////////////////
 
-G1 G53.2 F1000.5 X10 Y=AC(-30.5) Z = 40 + 10.0 S [spd%] T[PRETOOL%](comment) M10 M[Da%]
+G1 G53.2 F1000.5 X10 Y=AC(-30.5) Z = 40 + 10.0 S [SPD%] T[PRETOOL%](comment) M10 M[DA%]
 
 [Gcode](NIPS) G53.2 X[x_pos](comment) [AX_Y%][POS_Y] (comment) Z500
 
