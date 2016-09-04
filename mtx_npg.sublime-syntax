@@ -452,20 +452,27 @@ contexts:
     - match: '[-+]'
       scope: constant.numeric.mtx_npg
       set: din-arguments-body-value
+
+    - match: '[A-Z_]\w*[?%!]?(?=\s*[\(\),])'
+      scope: variable.other.mtx_npg
+      push:
+        - include: cpl-arguments-in-parens
+        - include: scope-end
+
     # parameter address ending with letter
     # X2.8 | X 2.8 | X-2.8 | X=2.8 | X.8 | X .8 | X[POS!]
     # parameter address ending with digit
     # X2 2.8 | X2 -2.8 | X2=2.8 | X2 .8 | X2[POS!]
     # also allows SEC%[POS!] as CPL-vars can be keys here
     - match: '(?x)
-              [A-Za-z_][\w?%!$]*?
+              [A-Z_]\w*
               (?:
-                \d+
+                \d+[?%!]?
                   (?:
-                    \s+(?=[-\.\d\"]) |
+                    \s+(?=[-\.\w\"@#]) |
                     \s*(?=[=\[])
                   ) |
-                \s*(?=[-=\[\d])
+                [?%!]?\s*(?=[-=\[\d])
               )'
       scope: variable.parameter.mtx_npg
       set: din-arguments-body-value
@@ -734,11 +741,17 @@ contexts:
       scope: constant.language.mtx_npg
 
   cpl-variables:
-    - match: '[@#]?[A-Z][A-Z0-9_]+[%$?!]?'
+    # @1 is a variable
+    # #1 is not a variable
+    # #A is a variable
+    # #a is not a variable
+    - match: '(?:@\d+|[@#]?[A-Z][A-Z0-9_]*)[%$?!]?'
       scope: variable.other.mtx_npg
       push:
         - meta_scope: meta.variable.mtx_npg
         - include: cpl-arguments-in-parens
+        - match: '[a-z]'
+          scope: invalid.illegal.mtx_npg
         - include: scope-end
 
   cpl-systemdata:

@@ -232,7 +232,7 @@ N1 P Prog(KEY 10 + COS(@2)) CPL (block comment)
 //  - DIN address list arguments
 //    - using argument names
 //    - and embedded CPL value with CPL functions
-N1 P Prog(KEY [SD.SETUP.SEC[MySec%+SIN(10)]]) (block comment)
+N1 P Prog(KEY [SD.SETUP.SEC[MYSEC%+SIN(10)]]) (block comment)
 //                                          <- meta.din.line
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
 //        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.arguments
@@ -263,7 +263,7 @@ N1 P Prog(KEY [SD.SETUP.SEC[MySec%+SIN(10)]]) (block comment)
 //  - DIN address list arguments
 //    - using argument names
 //    - and embedded CPL value
-N1 P [ Prog$ ] ( KEY [ SD.SETUP ] ) (block comment)
+N1 P [ PROG$ ] ( KEY [ SD.SETUP ] ) (block comment)
 //                                <- meta.din.line
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
 //              ^^^^^^^^^^^^^^^^^^ meta.arguments
@@ -332,7 +332,7 @@ N1 Prog(KEY [SD.SETUP] (comment)) (block comment)
 //  - DIN address list arguments
 //    - using argument names
 //    - and embedded CPL value
-N1 [Prog$](KEY[SD.SETUP] (comment) ) CPL (block comment)
+N1 [PROG$](KEY[SD.SETUP] (comment) ) CPL (block comment)
 //                                     <- meta.din.line
 //         ^^^^^^^^^^^^^^^^^^^^^^^^ meta.arguments
 // ^ punctuation.cpl.begin
@@ -356,7 +356,7 @@ N1 [Prog$](KEY[SD.SETUP] (comment) ) CPL (block comment)
 //  - DIN address list arguments
 //    - not using argument names
 //    - and directly access CPL value
-N1 Prog(intValue%(2) (comment)) (block comment)
+N1 Prog(INTVALUE%(2) (comment)) (block comment)
 //                            <- meta.din.line
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call
 //      ^^^^^^^^^^^^^^^^^^^^^^ meta.arguments
@@ -412,3 +412,8 @@ N1 REPEAT[count%] (comment) P SubProgram CPL
 //        ^^^^^^^^^^^^^^^^ string.quoted.double
 //                              ^ operator.skip-lf
 //                               ^ punctuation.arguments.end
+N1 P SubProg(P1% VAR, P2%, D4%)
+//           ^^^ variable.parameter
+//               ^^^ variable.other
+//                    ^^^ variable.other
+//                         ^^^ variable.other
