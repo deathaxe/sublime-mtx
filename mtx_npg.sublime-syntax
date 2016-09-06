@@ -35,6 +35,8 @@ variables:
   float: '(?:\d+\.?\d*|\.\d+)'
   # DIN label (see R911342633_02 P.62)
   label: '[A-Za-z_]{2}\w+\b'
+  # fully qualified path to program
+  path: '/[\w\./]+\b'
 
 ###############################################################################
 # MAIN CONTEXT
@@ -199,10 +201,10 @@ contexts:
           scope: string.unquoted.msg.mtx_npg
 
   din-stmt-procedures:
-    # NO PARAMETERS ALLOWED!
+    # NO PARAMETERS OR COMMENTS ALLOWED!
     - match: WAIT\b
       scope: meta.function-call.mtx_npg support.function.mtx_npg
-      set: din-stmt-end
+      set: illegal-end
     # DIN PARAMETERS ALLOWED!
     - match: '(?:S?|WR?)EV\b'
       scope: meta.function-call.mtx_npg support.function.mtx_npg
@@ -248,12 +250,12 @@ contexts:
       scope: meta.function-call.mtx_npg keyword.control.flow.mtx_npg
       set:
         - meta_content_scope: meta.din.line.mtx_npg meta.function-call.mtx_npg
-        - match: '[\w\./]+\b'
+        - match: '[\w\./]+\b' # simple name or full path
           scope: entity.name.program.mtx_npg
           set: din-subprogram-args
         - include: din-stmt-cplprog
         - include: din-stmt-end
-    - match: '[\w\./]+\b'
+    - match: '[\w\./]+\b'  # simple name or full path
       scope: meta.function-call.mtx_npg entity.name.program.mtx_npg
       set: din-subprogram-args
     - include: din-stmt-cplprog
@@ -453,7 +455,7 @@ contexts:
       scope: constant.numeric.mtx_npg
       set: din-arguments-body-value
 
-    - match: '/[/\w]+'
+    - match: '{{path}}'
       scope: string.unquoted.path.mtx_npg
 
     - match: '[A-Z_]\w*[?%!]?(?=\s*[\(\),])'
@@ -606,6 +608,14 @@ contexts:
     - match: (?:E(?:LSE|ND(?:CASE|IF)?)|LABEL|OTHERWISE|REPEAT|RPT)\b
       scope: keyword.control.flow.mtx_npg
 
+    # no comments or colon allowed after
+    - match: WAIT\b
+      scope: support.function.cpl.mtx_npg
+      set:
+        - meta_scope: meta.function-call.mtx_npg
+        - include: cpl-arguments-in-parens
+        - include: illegal-end
+
   cpl-stmt-call:
     # known CPL procedures (see R911342633_02 P.605ff.)
     - match: (?:CL(?:OSE|RWARN)|DB(?:LOAD|MOVE|SAVE)|LJUST|MMC|NJUST|OPEN[RW]|REWRITE|S(?:C(?:S|S(?:[3L]?|3L))|D(?:LOAD|SAVE)|E(?:EK|T(?:ERR|MSG|WARN)))|W(?:AIT|CS|SCS)|XTABCR|ZO(?:C(?:DEL|INS)|TCR))\b
@@ -699,6 +709,8 @@ contexts:
                 - include: din-comment
                 - include: scope-end
             - include: operators-seperator
+            - match: '{{path}}'
+              scope: string.unquoted.path.mtx_npg
             - include: cpl-expressions
 
   cpl-arguments-in-brackets:
@@ -717,6 +729,8 @@ contexts:
                 - include: din-comment
                 - include: scope-end
             - include: operators-seperator
+            - match: '{{path}}'
+              scope: string.unquoted.path.mtx_npg
             - include: cpl-expressions
 
   cpl-comment-line:
@@ -753,7 +767,7 @@ contexts:
       push:
         - meta_scope: meta.variable.mtx_npg
         - include: cpl-arguments-in-parens
-        - match: '[a-z]'
+        - match: '[a-z]+'
           scope: invalid.illegal.mtx_npg
         - include: scope-end
 

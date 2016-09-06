@@ -55,3 +55,15 @@ N10 REPEAT(12) (comment) P SubProgram(Key1 10, Var2 2)
 ////////////////////////////////////////////////////
 // DIN repeated function call
 N10 REPEAT[count%] (comment) P SubProgram
+
+////////////////////////////////////////////////////
+// DIN WAIT
+N10 WAIT  ; COMMENT
+//  ^^^^ support.function
+//        ^^^^^^^^^ invalid.illegal
+////////////////////////////////////////////////////
+// CPL WAIT
+110 WAIT  : REM comment
+//  ^^^^ support.function
+//        ^^^^^^^^^^^^^ invalid.illegal
+11 ABS(TEST)
