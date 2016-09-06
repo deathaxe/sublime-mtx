@@ -453,6 +453,9 @@ contexts:
       scope: constant.numeric.mtx_npg
       set: din-arguments-body-value
 
+    - match: '/[/\w]+'
+      scope: string.unquoted.path.mtx_npg
+
     - match: '[A-Z_]\w*[?%!]?(?=\s*[\(\),])'
       scope: variable.other.mtx_npg
       push:
