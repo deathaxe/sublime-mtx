@@ -5,7 +5,7 @@
 	<key>name</key>
 	<string>Symbol List - Labels</string>
 	<key>scope</key>
-	<string>source.mtx_npg &amp; entity.name.tag</string>
+	<string>source.mtx_npg &amp; entity.name.tag.label</string>
 	<key>settings</key>
 	<dict>
 		<key>showInSymbolList</key>

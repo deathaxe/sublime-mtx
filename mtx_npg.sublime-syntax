@@ -167,13 +167,13 @@ contexts:
       set:
         - meta_content_scope: meta.din.line.mtx_npg
         - match: '{{label}}|N\d+\b'
-          scope: string.unquoted.mtx_npg
+          scope: entity.name.tag.goto-target.din.mtx_npg
           set: din-stmt-end
         - include: din-embedded-cpl
         - include: din-stmt-end
     - match: '({{label}})(:)'
       captures:
-        1: entity.name.tag.din.mtx_npg
+        1: entity.name.tag.label.din.mtx_npg
         2: punctuation.definition.tag.din.mtx_npg
       set: din-stmt-end
 
@@ -654,13 +654,13 @@ contexts:
       set:
         - meta_content_scope: meta.cpl.line.mtx_npg meta.goto.mtx_npg
         - match: '(?:\.\w+|\bN\d+)\b'
-          scope: string.unquoted.mtx_npg
+          scope: entity.name.tag.goto-target.cpl.mtx_npg
           set: cpl-stmt-end
         - include: cpl-stmt-end
     - match: '(\.)({{label}})\b'
       captures:
         1: punctuation.definition.tag.cpl.mtx_npg
-        2: entity.name.tag.cpl.mtx_npg
+        2: entity.name.tag.label.cpl.mtx_npg
       set: cpl-stmt-end
 
 ###############################################################################
