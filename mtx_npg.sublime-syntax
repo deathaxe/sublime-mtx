@@ -405,7 +405,7 @@ contexts:
     # IC(...), DC(...), AC(...), ACP(...), ACN(...)
     # INCH(...), MM(...), S(...)
     - match: '(?:[ID]C|AC[PN]?|INCH|MM|S)\b'
-      scope: support.variable.property.mtx_npg
+      scope: support.function.modifier.din.mtx_npg
       push:
         - include: din-arguments-in-parens
         - include: scope-end
