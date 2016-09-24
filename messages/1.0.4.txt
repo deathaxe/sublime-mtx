@@ -1,0 +1,10 @@
+  VERSION 1.0.4
+
+  CHANGES
+  * match all full qualified paths as unquoted string
+  * highlight comments after WAIT as illegal
+  * allow multiple SSD commands per line
+  * highlight IC(..), AC(..), etc. as functions
+  * add some missing DIN functions
+  * highlight all labels as tags.
+  * removed functions symbol transformation to make default Goto Definition popup work.

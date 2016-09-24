@@ -1,0 +1,7 @@
+  VERSION 1.0.3
+
+  CHANGES
+  * allow CPL variables with only 1 capital letter (e.g.: #N)
+  * allow permanent CPL variables with only 1 number (e.g.: @2)
+  * allow only variables with capital letters everywhere
+  * fix some highlighting issues in DIN function-call-arguments with parentheses

@@ -45,7 +45,7 @@ For all Sublime Text 2/3 users install via [Package Control][2] is recommended.
 
 ## Setup
 
-The package contains the syntax specific settings files ``mtx_npg.sublime-settings`` and ``mtx_scs.sublime-settings`` with the following required default settings:
+If ``mtx_npg.sublime-settings`` or ``mtx_scs.sublime-settings`` don't exist in the user folder they will be automatically created to ensure the following essential syntax specific settings:
 
 ```javascript
 {
