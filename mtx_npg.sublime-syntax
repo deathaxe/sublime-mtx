@@ -636,7 +636,7 @@ contexts:
       scope: meta.function-call.mtx_npg keyword.control.flow.mtx_npg
       set:
         - meta_content_scope: meta.cpl.line.mtx_npg meta.function-call.mtx_npg
-        - match: '[\w\.]+\b'
+        - match: '[\w\./]+\b'
           scope: entity.name.program.mtx_npg
           set:
             - meta_content_scope: meta.cpl.line.mtx_npg meta.function-call.mtx_npg
