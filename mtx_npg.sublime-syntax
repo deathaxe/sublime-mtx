@@ -645,8 +645,8 @@ contexts:
               set: cpl-block-end
             - include: din-arguments-in-parens # cpl-arguments-in-parens
             - include: cpl-arguments-in-brackets
-            - include: cpl-block-end
-        - include: cpl-block-end
+            - include: illegal-end
+        - include: illegal-end
 
   cpl-stmt-goto:
     - match: GOTO\b
