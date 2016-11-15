@@ -456,16 +456,14 @@ contexts:
       push: din-arguments-body
 
   din-arguments-body:
-    - meta_content_scope: meta.arguments.mtx_npg
+    - meta_scope: meta.arguments.mtx_npg
     - include: din-arguments-end
     - include: cpl-constants
     - match: '[-+]'
       scope: constant.numeric.mtx_npg
       set: din-arguments-body-value
-
     - match: '{{path}}'
       scope: string.unquoted.path.mtx_npg
-
     - match: '[A-Z_]\w*[?%!]?(?=\s*[\(\),])'
       scope: variable.other.mtx_npg
       push:
@@ -706,7 +704,7 @@ contexts:
     - match: \(
       scope: punctuation.arguments.begin.mtx_npg
       push:
-        - meta_content_scope: meta.arguments.mtx_npg
+        - meta_scope: meta.arguments.mtx_npg
         - match: '{{sign}}'
           scope: constant.numeric.mtx_npg
           set:
@@ -726,7 +724,7 @@ contexts:
     - match: \[
       scope: punctuation.arguments.begin.mtx_npg
       push:
-        - meta_content_scope: meta.arguments.mtx_npg
+        - meta_scope: meta.arguments.mtx_npg
         - match: '{{sign}}'
           scope: constant.numeric.mtx_npg
           set:
