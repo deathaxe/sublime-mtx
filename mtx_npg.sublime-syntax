@@ -458,6 +458,7 @@ contexts:
   din-arguments-body:
     - meta_content_scope: meta.arguments.mtx_npg
     - include: din-arguments-end
+    - include: cpl-constants
     - match: '[-+]'
       scope: constant.numeric.mtx_npg
       set: din-arguments-body-value
