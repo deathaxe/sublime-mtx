@@ -67,6 +67,15 @@ N10 KvProg([AX_NAME$][X_VAL])		; comment
 //                    ^^^^^ variable.other
 //                         ^ punctuation.cpl.end
 //                          ^ punctuation.arguments.end
+// User cylce
+N10 MYCYCLE(TRUE)
+//         ^^^^^^ meta.arguments
+//  ^^^^^^^ entity.name.program
+//          ^^^^ constant.numeric.bool
+N10 MYCYCLE[TRUE]
+//         ^^^^^^ meta.arguments
+//  ^^^^^^^ entity.name.program
+//          ^^^^ constant.numeric.bool
 // DIN predefined function with CPL argument list
 N10 SSDE[SD.Data[10] = @1]
 //                       <- meta.din.line
