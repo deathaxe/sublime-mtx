@@ -27,13 +27,10 @@ file_extensions:
   - cpl
   - npg
   - prg
-first_line_match: (?x)
-                  # pragma statements
+first_line_match: '(?x)(?:
                   \((?:ADR_PARA|CPL|DIN|NPG)\)|
-                  # channel lock statement ($1)
-                  ^\s*(?:N\d+\s*)?\$\d+\b|
-                  # GOTO .NOCOM statement
-                  \bGOTO\s*.\w+\b
+                  \$\d+|
+                  \bGOTO\s*.\w+)\s*$'
 scope: source.mtx_npg
 
 variables:
@@ -43,9 +40,8 @@ variables:
   label: '[A-Za-z_]{2}\w+\b'
   # fle extension
   ext: \.\w+\b
-  fn: '\w+{{ext}}'
   # fully qualified path to program
-  path: '(?i:/[-/\w]+\b(?:{{ext}})?|{{fn}})'
+  path: '(?i:/[-/\w]+\b(?:{{ext}})?|\w+{{ext}})'
 
 ###############################################################################
 # MAIN CONTEXT
