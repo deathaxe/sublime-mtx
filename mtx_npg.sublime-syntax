@@ -27,7 +27,13 @@ file_extensions:
   - cpl
   - npg
   - prg
-first_line_match: '\((?:ADR_PARA|CPL|DIN|NPG)\)|\bGOTO\s*.\w+\b'
+first_line_match: (?x)
+                  # pragma statements
+                  \((?:ADR_PARA|CPL|DIN|NPG)\)|
+                  # channel lock statement ($1)
+                  ^\s*(?:N\d+\s*)?\$\d+\b|
+                  # GOTO .NOCOM statement
+                  \bGOTO\s*.\w+\b
 scope: source.mtx_npg
 
 variables:
