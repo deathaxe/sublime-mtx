@@ -41,8 +41,11 @@ variables:
   float: '(?:\d+\.?\d*|\.\d+)'
   # DIN label (see R911342633_02 P.62)
   label: '[A-Za-z_]{2}\w+\b'
+  # fle extension
+  ext: \.\w+\b
+  fn: '\w+{{ext}}'
   # fully qualified path to program
-  path: '/[\w\./]+\b'
+  path: '(?i:/[-/\w]+\b(?:{{ext}})?|{{fn}})'
 
 ###############################################################################
 # MAIN CONTEXT
@@ -135,6 +138,7 @@ contexts:
   din-statements:
     - meta_scope: meta.din.line.mtx_npg
     - include: line-end
+    - include: din-functions
     - include: din-positions
     - include: din-parameter
     - include: din-ncfunction
@@ -144,7 +148,6 @@ contexts:
     - include: operators
     - include: din-stmt-goto
     - include: din-stmt-msg
-    - include: din-functions
     - include: din-stmt-procedures
     - include: din-stmt-definition-sub
     - include: din-stmt-repeat
@@ -263,7 +266,8 @@ contexts:
       scope: meta.function-call.mtx_npg keyword.control.flow.mtx_npg
       set:
         - meta_content_scope: meta.din.line.mtx_npg meta.function-call.mtx_npg
-        - match: '[\w\./]+\b' # simple name or full path
+        # relative or absolute program path and name
+        - match: '{{path}}|\w+'
           scope: entity.name.program.mtx_npg
           set: din-subprogram-args
         - include: din-stmt-cplprog
@@ -349,7 +353,7 @@ contexts:
       scope: constant.language.positioning.mtx_npg
 
   din-functions:
-    - match: (?:A(?:A[CS]|ctRadFact|DJ|djust|IT|JK|LN|R[AF]|rea|SP(?:CLR|DIS|ENA|RTP|S(?:ET|TA))|ssLogName|T(?:[RS]|rans|SW)|V[ES]|x(?:Ac(?:c|cSave)|Couple|is(?:Replace|ToSpindle)|Jerk|Ve(?:l|lSave))|X[CR])|B(?:CR|csCorr|lkNmb|NB)|C(?:FD|G0|h(?:kNxtBlk|Length|Section)|H[LS]|L[DN]|NB|o(?:llision|n(?:fG0|stFeed)|ord|rnerLineDetection|upleSplineTab)|PI|RD|ST|urveParamInterpolation)|D(?:AX|C[RS]|cTSel|ef(?:Axis|Spindle|TangTrans)|IA|i(?:aProg|stCtrl)|SP|TT)|E(?:ndPosCouple|PC)|F(?:AD|D(?:G|GT)|eed(?:Ad|Forward|Gr(?:p|pType))|FW|lyMeas|ME|S[MPRT]|s(?:Move|Probe|Reset|Torque))|G(?:AX|et(?:Axis|Spindle)|SP)|H(?:SB|sBlkSwitch)|I(?:ME|n(?:itMeas|vTime)|TIM)|J(?:AL|erk(?:AxList|Control)|KC)|K(?:inSplitDisable|SD|VP|vProg)|L(?:F(?:[CP]|Conf)|in(?:DownFeed|earToSpline|ModZp|UpFeed)|MZ|N[DU]|TS)|M(?:ainSp|IR|irror|OD|odulo|S[GP])|N(?:IB|ibble)|O|O(?:V[DE]|vr(?:Dis|Ena))|P(?:AC|athAcc|HS|LS|M[DS]|mTSel|o(?:l(?:arPol|eSet)|s(?:DepHSOut|Mode))|OP|recProg|RP|t(?:BlkEnd|Default|Inpos|pMove)|T[DEIP]|UN|unch)|R(?:A[CDX]|ad(?:ialAcc|Prog)|CB|DT|e(?:cordRevVec|dTorque|entContBlk|m(?:Axis|LogName|Spindle))|LN|N[DE]|OT|o(?:tate|und(?:Eps|ing))|RV|SP)|S(?:2[DU]|cale|C(?:[CLO]|CT|LN|OL)|e(?:lCrdCoupl(?:e|eTab)|tPos)|hift|HT|in(?:2(?:DownFeed|UpFeed)|DownFeed|UpFeed)|m(?:ax|in)|M[DENX]|N[DU]|P(?:[ADMST]|C(?:_WA|[CDEPS]|P_W)|WAIT)|p(?:Admin|Couple(?:_Wait|Config|Dist|ErrWin|P(?:o|osOffs)|Sync)|indle(?:ToAxis|Wai(?:t|tMode))|li(?:ne(?:Cornerin(?:g|gLocal)|Def)|t)|Mode)|S(?:P[MOS]|p(?:Move|Ori|Speed))|T(?:[AO]|AW)|t(?:atToolOri|epMode(?:Disable|Enable))|WM)|sOffs_Wait|T(?:a(?:ngToo(?:l|lOri)|ppSp|rgetAxisConf)|AX|CS|csDef|hreadSet|rans|RS|S[PT]|T[LO])|V(?:AP|irtAxisPos)|W(?:aitAxis|AX|ID3|in|riteId3)|Z(?:OS|oTSel))\b
+    - match: (?:A(?:A[CS]|ctRadFact|DJ|djust|IT|JK|LN|R[AF]|rea|SP(?:CLR|DIS|ENA|RTP|S(?:ET|TA))|ssLogName|T(?:[RS]|rans|SW)|V[ES]|x(?:Ac(?:c|cSave)|Couple|is(?:Replace|ToSpindle)|Jerk|Ve(?:l|lSave))|X[CR])|B(?:CR|csCorr|lkNmb|NB)|C(?:FD|G0|h(?:kNxtBlk|Length|Section)|H[LS]|L[DN]|NB|o(?:llision|n(?:fG0|stFeed)|ord|rnerLineDetection|upleSplineTab)|PI|RD|ST|urveParamInterpolation)|D(?:AX|C[RS]|cTSel|ef(?:Axis|Spindle|TangTrans)|IA|i(?:aProg|stCtrl)|SP|TT)|E(?:ndPosCouple|PC)|F(?:AD|D(?:G|GT)|eed(?:Ad|Forward|Gr(?:p|pType))|FW|lyMeas|ME|S[MPRT]|s(?:Move|Probe|Reset|Torque))|G(?:AX|et(?:Axis|Spindle)|SP)|H(?:SB|sBlkSwitch)|I(?:ME|n(?:itMeas|vTime)|TIM)|J(?:AL|erk(?:AxList|Control)|KC)|K(?:inSplitDisable|SD|VP|vProg)|L(?:F(?:[CP]|Conf)|in(?:DownFeed|earToSpline|ModZp|UpFeed)|MZ|N[DU]|TS)|M(?:ainSp|IR|irror|OD|odulo|S[GP])|N(?:IB|ibble)|O|O(?:V[DE]|vr(?:Dis|Ena))|P(?:AC|athAcc|HS|LS|M[DS]|mTSel|o(?:l(?:arPol|eSet)|s(?:DepHSOut|Mode))|OP|recProg|RP|t(?:BlkEnd|Default|Inpos|pMove)|T[DEIP]|UN|unch)|R(?:A[CDX]|ad(?:ialAcc|Prog)|CB|DT|e(?:cordRevVec|dTorque|entContBlk|m(?:Axis|LogName|Spindle))|LN|N[DE]|OT|o(?:tate|und(?:Eps|ing))|RV|SP)|S(?:2[DU]|cale|C(?:[CLO]|CT|LN|OL)|e(?:lCrdCoupl(?:e|eTab)|tPos)|hift|HT|in(?:2(?:DownFeed|UpFeed)|DownFeed|UpFeed)|M(?:ax|[DENX]|in)|N[DU]|P(?:[ADMST]|C(?:_WA|[CDEPS]|P_W)|WAIT)|p(?:Admin|Couple(?:_Wait|Config|Dist|ErrWin|P(?:o|osOffs)|Sync)|indle(?:ToAxis|Wai(?:t|tMode))|li(?:ne(?:Cornerin(?:g|gLocal)|Def)|t)|Mode)|S(?:P[MOS]|p(?:Move|Ori|Speed))|T(?:[AO]|AW)|t(?:atToolOri|epMode(?:Disable|Enable))|WM)|sOffs_Wait|T(?:a(?:ngToo(?:l|lOri)|ppSp|rgetAxisConf)|AX|CS|csDef|hreadSet|rans|RS|S[PT]|T[LO])|V(?:AP|irtAxisPos)|W(?:aitAxis|AX|ID3|in|riteId3)|Z(?:OS|oTSel))\b
       scope: support.function.din.mtx_npg
       push:
         - meta_scope: meta.function-call.mtx_npg
@@ -468,13 +472,8 @@ contexts:
     - match: '[-+]'
       scope: constant.numeric.mtx_npg
       set: din-arguments-body-value
-    - match: '{{path}}'
+    - match: '{{path}}(?=\s*[,\)\]])'
       scope: string.unquoted.path.mtx_npg
-    - match: '[A-Z_]\w*[?%!]?(?=\s*[\(\),])'
-      scope: variable.other.mtx_npg
-      push:
-        - include: cpl-arguments-in-parens
-        - include: scope-end
 
     # parameter address ending with letter
     # X2.8 | X 2.8 | X-2.8 | X=2.8 | X.8 | X .8 | X[POS!]
@@ -482,7 +481,7 @@ contexts:
     # X2 2.8 | X2 -2.8 | X2=2.8 | X2 .8 | X2[POS!]
     # also allows SEC%[POS!] as CPL-vars can be keys here
     - match: '(?x)
-              [A-Z_]\w*
+              [A-Z]+
               (?:
                 \d+[?%!]?
                   (?:
@@ -493,6 +492,12 @@ contexts:
               )'
       scope: variable.parameter.mtx_npg
       set: din-arguments-body-value
+
+    # DIN parameter with string value
+    - match: '([A-Z_]+)?\b\s*(?i:([\w ]+?))(?=\s*[,\)\]])'
+      captures:
+        1: variable.parameter.mtx_npg
+        2: string.unquoted.mtx_npg
 
     - match: '(?=\S)'
       set: din-arguments-body-value
@@ -641,7 +646,7 @@ contexts:
       scope: meta.function-call.mtx_npg keyword.control.flow.mtx_npg
       set:
         - meta_content_scope: meta.cpl.line.mtx_npg meta.function-call.mtx_npg
-        - match: '[\w\./]+\b'
+        - match: '{{path}}|\w+'
           scope: entity.name.program.mtx_npg
           set:
             - meta_content_scope: meta.cpl.line.mtx_npg meta.function-call.mtx_npg
@@ -721,7 +726,7 @@ contexts:
                 - include: din-comment
                 - include: scope-end
             - include: operators-seperator
-            - match: '{{path}}'
+            - match: '{{path}}(?=\s*[,\)\]])'
               scope: string.unquoted.path.mtx_npg
             - include: cpl-expressions
 
@@ -741,9 +746,9 @@ contexts:
                 - include: din-comment
                 - include: scope-end
             - include: operators-seperator
+            - include: cpl-expressions
             - match: '{{path}}'
               scope: string.unquoted.path.mtx_npg
-            - include: cpl-expressions
 
   cpl-comment-line:
     - match: \bREM\b.*$
