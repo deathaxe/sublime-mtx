@@ -37,7 +37,7 @@ variables:
   sign: '\s*[-+]?'
   float: '(?:\d+\.?\d*|\.\d+)'
   # DIN label (see R911342633_02 P.62)
-  label: '[A-Za-z_]{2}\w+\b'
+  label: '[A-Za-z_]{2}\w*\b'
   # fle extension
   ext: \.\w+\b
   # fully qualified path to program
@@ -775,7 +775,7 @@ contexts:
     # #1 is not a variable
     # #A is a variable
     # #a is not a variable
-    - match: '(?:@\d+|[@#]?[A-Z][A-Z0-9_]*)[%$?!]?'
+    - match: '(?:@\d+|[@#]?[A-Z_][A-Z0-9_]*)[%$?!]?'
       scope: variable.other.mtx_npg
       push:
         - meta_scope: meta.variable.mtx_npg
