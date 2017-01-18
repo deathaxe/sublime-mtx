@@ -34,7 +34,6 @@ first_line_match: '(?x)(?:
 scope: source.mtx_npg
 
 variables:
-  sign: '\s*[-+]?'
   float: '(?:\d+\.?\d*|\.\d+)'
   # DIN label (see R911342633_02 P.62)
   label: '[A-Za-z_]{2}\w*\b'
@@ -120,10 +119,10 @@ contexts:
       push: after-operators
 
   after-operators:
-    - include: cpl-group-set
-    - match: '{{sign}}'
+    - match: '[-+]'
       scope: constant.numeric.mtx_npg
       pop: true
+    - include: scope-end
 
 ###############################################################################
 # +-------------------------------------------------------------------------+ #
@@ -518,15 +517,14 @@ contexts:
   din-embedded-cpl:
     - match: \[
       scope: punctuation.cpl.begin.mtx_npg
-      push:
-        - match: '{{sign}}'
-          scope: meta.cpl.mtx_npg constant.numeric.mtx_npg
-          set:
-            - meta_content_scope: meta.cpl.mtx_npg
-            - match: \]
-              scope: punctuation.cpl.end.mtx_npg
-              pop: true
-            - include: cpl-expressions
+      push: [din-embedded-cpl-body, after-operators]
+
+  din-embedded-cpl-body:
+    - meta_scope: meta.cpl.mtx_npg
+    - match: \]
+      scope: punctuation.cpl.end.mtx_npg
+      pop: true
+    - include: cpl-expressions
 
 ###############################################################################
 # +-------------------------------------------------------------------------+ #
@@ -685,66 +683,55 @@ contexts:
   cpl-group:
     - match: \(
       scope: punctuation.group.begin.mtx_npg
-      push:
-        - match: '{{sign}}'
-          scope: constant.numeric.mtx_npg
-          set:
-            - match: \)
-              scope: punctuation.group.end.mtx_npg
-              pop: true
-            - include: cpl-expressions
+      push: [cpl-group-body, after-operators]
 
-  cpl-group-set:
-    - match: \(
-      scope: punctuation.group.begin.mtx_npg
-      set:
-        - match: '{{sign}}'
-          scope: constant.numeric.mtx_npg
-          set:
-            - match: \)
-              scope: punctuation.group.end.mtx_npg
-              pop: true
-            - include: cpl-expressions
+  cpl-group-body:
+    - match: \)
+      scope: punctuation.group.end.mtx_npg
+      pop: true
+    - include: cpl-expressions
 
   cpl-arguments-in-parens:
     # see R911342633_02 P.53f.
     - match: \(
       scope: punctuation.arguments.begin.mtx_npg
-      push:
-        - meta_scope: meta.arguments.mtx_npg
-        - match: '{{sign}}'
-          scope: constant.numeric.mtx_npg
-          set:
-            - meta_content_scope: meta.arguments.mtx_npg
-            - match: \)
-              scope: punctuation.arguments.end.mtx_npg
-              set:
-                - include: din-comment
-                - include: scope-end
-            - include: operators-seperator
-            - match: '{{path}}(?=\s*[,\)\]])'
-              scope: string.unquoted.path.mtx_npg
-            - include: cpl-expressions
+      push: [cpl-argments-in-parens-body, after-operators]
+
+  cpl-argments-in-parens-body:
+    - meta_scope: meta.arguments.mtx_npg
+    - include: cpl-argments-in-parens-end
+    - include: operators-seperator
+    - match: '{{path}}(?=\s*[,\)\]])'
+      scope: string.unquoted.path.mtx_npg
+    - include: cpl-expressions
+
+  cpl-argments-in-parens-end:
+    - match: \)
+      scope: punctuation.arguments.end.mtx_npg
+      set:
+        - include: din-comment
+        - include: scope-end
 
   cpl-arguments-in-brackets:
     # see R911342633_02 P.55f.
     - match: \[
       scope: punctuation.arguments.begin.mtx_npg
-      push:
-        - meta_scope: meta.arguments.mtx_npg
-        - match: '{{sign}}'
-          scope: constant.numeric.mtx_npg
-          set:
-            - meta_content_scope: meta.arguments.mtx_npg
-            - match: \]
-              scope: punctuation.arguments.end.mtx_npg
-              set:
-                - include: din-comment
-                - include: scope-end
-            - include: operators-seperator
-            - include: cpl-expressions
-            - match: '{{path}}'
-              scope: string.unquoted.path.mtx_npg
+      push: [cpl-arguments-in-brackets-body, after-operators]
+
+  cpl-arguments-in-brackets-body:
+    - meta_scope: meta.arguments.mtx_npg
+    - include: cpl-argments-in-brackets-end
+    - include: operators-seperator
+    - include: cpl-expressions
+    - match: '{{path}}(?=\s*[,\)\]])'
+      scope: string.unquoted.path.mtx_npg
+
+  cpl-argments-in-brackets-end:
+    - match: \]
+      scope: punctuation.arguments.end.mtx_npg
+      set:
+        - include: din-comment
+        - include: scope-end
 
   cpl-comment-line:
     - match: \bREM\b.*$
