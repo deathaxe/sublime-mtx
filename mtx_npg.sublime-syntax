@@ -631,7 +631,7 @@ contexts:
 
   cpl-stmt-call:
     # known CPL procedures (see R911342633_02 P.605ff.)
-    - match: (?:CL(?:OSE|RWARN)|DB(?:LOAD|MOVE|SAVE)|LJUST|MMC|NJUST|OPEN[RW]|REWRITE|S(?:C(?:S|S(?:[3L]|3L))|D(?:LOAD|SAVE)|E(?:EK|T(?:ERR|MSG|WARN)))|W(?:AIT|CS|SCS)|XTABCR|ZO(?:C(?:DEL|INS)|TCR))\b
+    - match: (?:CL(?:OSE|RWARN)|DB(?:LOAD|MOVE|SAVE)|LJUST|MMC|NJUST|OPEN[RW]|REWRITE|S(?:C(?:S|S(?:[3L]|3L))|D(?:LOAD|SAVE)|E(?:EK|T(?:ERR|MSG|WARN)))|W(?:AIT|SCS)|XTABCR|ZO(?:C(?:DEL|INS)|TCR))\b
       scope: meta.function-call.mtx_npg support.function.cpl.mtx_npg
       set:
         - meta_content_scope: meta.cpl.line.mtx_npg meta.function-call.mtx_npg
