@@ -597,8 +597,9 @@ contexts:
         - meta_content_scope: meta.cpl.line.mtx_npg meta.control.mtx_npg
         - match: \b(?:STEP|TO)\b
           scope: keyword.control.flow.mtx_npg
+          set: cpl-statements
         - include: cpl-expressions
-        - include: cpl-stmt-end
+        - include: cpl-block-end
 
     - match: WHILE\b
       scope: meta.control.mtx_npg keyword.control.flow.mtx_npg
@@ -606,8 +607,9 @@ contexts:
         - meta_content_scope: meta.cpl.line.mtx_npg meta.control.mtx_npg
         - match: \bDO\b
           scope: keyword.control.flow.mtx_npg
+          set: cpl-statements
         - include: cpl-expressions
-        - include: cpl-stmt-end
+        - include: cpl-block-end
 
     - match: (?:NEXT|UNTIL)\b
       scope: meta.control.mtx_npg keyword.control.flow.mtx_npg
