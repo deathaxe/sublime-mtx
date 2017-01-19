@@ -208,7 +208,7 @@ contexts:
     # NO PARAMETERS OR COMMENTS ALLOWED!
     - match: WAIT\b
       scope: meta.function-call.mtx_npg support.function.mtx_npg
-      set: illegal-end
+      set: din-stmt-end
     # DIN PARAMETERS ALLOWED!
     - match: '(?:S?|WR?)EV\b'
       scope: meta.function-call.mtx_npg support.function.mtx_npg
