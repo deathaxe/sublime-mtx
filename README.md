@@ -1,6 +1,6 @@
 # [CNC BoschRexroth MTX language support][home]
 [![The MIT License](https://img.shields.io/badge/license-MIT-orange.svg?style=flat-square)](LICENSE)
-[![Package Control](https://packagecontrol.herokuapp.com/downloads/CNC BoschRexroth MTX.svg?style=flat-square)](https://packagecontrol.io/packages/CNC BoschRexroth MTX)
+[![Package Control](https://packagecontrol.herokuapp.com/downloads/CNC%20BoschRexroth%20MTX.svg?style=flat-square)](https://packagecontrol.io/packages/CNC%20BoschRexroth%20MTX)
 
 This package provides syntax highlighting support for the
 [BoschRexroth MTX][4] Computerized Numerical Control to the [SublimeText 3 Editor][1].
