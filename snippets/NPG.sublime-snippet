@@ -9,7 +9,7 @@
 ; VERSION        : ${3:1.0}
 ; DATE           : ${4:2016}-${5:04}-${6:01}
 ; AUTHOR         : ${7}
-; COMPANTY       : ${8:Company}
+; COMPANY       : ${8:Company}
 ; TARGET         : ${9}
 ;
 ; DESCRIPTION    : $10
